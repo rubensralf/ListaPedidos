@@ -10,12 +10,11 @@ uses
   FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client, FireDAC.Stan.ExprFuncs,
   FireDAC.Phys.SQLiteDef, FireDAC.Phys.SQLite, Vcl.Grids, Vcl.DBGrids,
   Vcl.ExtCtrls, FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf,
-  FireDAC.DApt, FireDAC.Comp.DataSet, Vcl.Mask;
+  FireDAC.DApt, FireDAC.Comp.DataSet, Vcl.Mask, Vcl.Buttons, PngSpeedButton;
 
 type
   TfPrincipal = class(TForm)
     pnlPedidos: TPanel;
-    pnlPedidosCampos: TPanel;
     dbgPedidos: TDBGrid;
     pnlTituloPedidos: TPanel;
     quPedidos: TFDQuery;
@@ -25,16 +24,41 @@ type
     quPedidosdescricao: TStringField;
     quPedidossituacao: TSmallintField;
     quPedidosvalorTotal: TFloatField;
+    pnlCampos: TPanel;
+    pnlPedidosCampos: TPanel;
     lblData: TLabel;
-    lblDescricao: TLabel;
-    lblSituacao: TLabel;
-    lblValorTotalPedido: TLabel;
     medData: TMaskEdit;
-    cbbSituacao: TComboBox;
-    medValorTotalPedido: TMaskEdit;
+    lblDescricao: TLabel;
     mmoDescricaoPedido: TMemo;
-    lblCodigo: TLabel;
-    edtCodigoPedido: TEdit;
+    cbbSituacao: TComboBox;
+    lblSituacao: TLabel;
+    pnlValorLiquido: TPanel;
+    lblValorBruto: TLabel;
+    lblValorDesconto: TLabel;
+    pnl1: TPanel;
+    lblValorLiquido: TLabel;
+    pnl2: TPanel;
+    pnlItens: TPanel;
+    pnl3: TPanel;
+    pnl4: TPanel;
+    pnlDadosItens: TPanel;
+    dbgItensPedido: TDBGrid;
+    quItensPedido: TFDQuery;
+    dsItensPedido: TDataSource;
+    quItensPedidoquantidade: TSmallintField;
+    quItensPedidodesconto: TFloatField;
+    quItensPedidovalorTotal: TFloatField;
+    quItensPedidocodigo: TIntegerField;
+    quItensPedidodescricao: TStringField;
+    lblItem: TLabel;
+    cbbItem: TComboBox;
+    lblQuantidade: TLabel;
+    edtQuantidade: TEdit;
+    medValor: TMaskEdit;
+    lblVlrDesconto: TLabel;
+    pnlSair: TPanel;
+    pnlSair2: TPanel;
+    sbtSair: TPngSpeedButton;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
 
