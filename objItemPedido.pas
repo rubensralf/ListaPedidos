@@ -29,17 +29,18 @@ type
       procedure setDesconto(const Value: Double);
       procedure setValorTotal(const Value: Double);
 
-      function Salvar : Boolean;
-      function Editar : Boolean;
-      function Excluir : Boolean;
-      function ExcluirItens : Boolean;
-
     public
       property numeroPedido : Integer read getNumeroPedido write setNumeroPedido;
       property codigoItem : Integer read getCodigoItem write setCodigoItem;
       property quantidade : Integer read getQuantidade write setQuantidade;
       property desconto : Double read getDesconto write setDesconto;
       property valorTotal : Double read getValorTotal write setValorTotal;
+
+      function Salvar : Boolean;
+      function Editar : Boolean;
+      function Excluir : Boolean;
+      function ExcluirItensPorPedido : Boolean;
+      function PossuiItens : Boolean;
 
       constructor Create(objConexao : TFDConnection);
       destructor Destroy;
@@ -221,7 +222,7 @@ begin
   end;
 end;
 
-function TItemPedido.ExcluirItens: Boolean;
+function TItemPedido.ExcluirItensPorPedido: Boolean;
 var
   quExcluir : TFDQuery;
 begin
@@ -245,11 +246,42 @@ begin
       result := True;
     except
       on e:Exception do
-        ShowMessage('Falha ao excluir itens do pedido!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create('Falha ao excluir itens do pedido!' + #13 + 'Erro: ' + e.Message);
     end;
   finally
     quExcluir.Close;
     FreeAndNil(quExcluir);
+  end;
+end;
+
+function TItemPedido.PossuiItens: Boolean;
+var
+  quItensPedido : TFDQuery;
+begin
+  try
+    quItensPedido := TFDQuery.Create(nil);
+    quItensPedido.Connection := Fconexao;
+
+    try
+      result := false;
+
+      quItensPedido.Close;
+      quItensPedido.SQL.Clear;
+      quItensPedido.SQL.Add('SELECT CODIGOITEM');
+      quItensPedido.SQL.Add('FROM   ITENSPEDIDO');
+      quItensPedido.SQL.Add('WHERE  NUMEROPEDIDO = :NUMEROPEDIDO');
+      quItensPedido.Params.ParamByName('NUMEROPEDIDO').AsInteger := numeroPedido;
+      quItensPedido.Open;
+
+      if not quItensPedido.Eof then
+        result := true;
+    except
+      on e:Exception do
+        raise Exception.Create('Falha ao verificar se pedido possui itens!' + #13 + 'Erro: ' + e.Message);
+    end;
+  finally
+    quItensPedido.Close;
+    FreeAndNil(quItensPedido);
   end;
 end;
 

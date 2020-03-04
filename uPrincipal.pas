@@ -10,57 +10,21 @@ uses
   FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client, FireDAC.Stan.ExprFuncs,
   FireDAC.Phys.SQLiteDef, FireDAC.Phys.SQLite, Vcl.Grids, Vcl.DBGrids,
   Vcl.ExtCtrls, FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf,
-  FireDAC.DApt, FireDAC.Comp.DataSet, Vcl.Mask, Vcl.Buttons, PngSpeedButton;
+  FireDAC.DApt, FireDAC.Comp.DataSet, Vcl.Mask, Vcl.Buttons, PngSpeedButton,
+  Vcl.ComCtrls, Vcl.Menus;
 
 type
   TfPrincipal = class(TForm)
-    pnlPedidos: TPanel;
-    dbgPedidos: TDBGrid;
-    pnlTituloPedidos: TPanel;
-    quPedidos: TFDQuery;
-    dsPedidos: TDataSource;
-    quPedidosnumero: TFDAutoIncField;
-    quPedidosdata: TDateField;
-    quPedidosdescricao: TStringField;
-    quPedidossituacao: TSmallintField;
-    quPedidosvalorTotal: TFloatField;
-    pnlCampos: TPanel;
-    pnlPedidosCampos: TPanel;
-    lblData: TLabel;
-    medData: TMaskEdit;
-    lblDescricao: TLabel;
-    mmoDescricaoPedido: TMemo;
-    cbbSituacao: TComboBox;
-    lblSituacao: TLabel;
-    pnlValorLiquido: TPanel;
-    lblValorBruto: TLabel;
-    lblValorDesconto: TLabel;
-    pnl1: TPanel;
-    lblValorLiquido: TLabel;
-    pnl2: TPanel;
-    pnlItens: TPanel;
-    pnl3: TPanel;
-    pnl4: TPanel;
-    pnlDadosItens: TPanel;
-    dbgItensPedido: TDBGrid;
-    quItensPedido: TFDQuery;
-    dsItensPedido: TDataSource;
-    quItensPedidoquantidade: TSmallintField;
-    quItensPedidodesconto: TFloatField;
-    quItensPedidovalorTotal: TFloatField;
-    quItensPedidocodigo: TIntegerField;
-    quItensPedidodescricao: TStringField;
-    lblItem: TLabel;
-    cbbItem: TComboBox;
-    lblQuantidade: TLabel;
-    edtQuantidade: TEdit;
-    medValor: TMaskEdit;
-    lblVlrDesconto: TLabel;
-    pnlSair: TPanel;
-    pnlSair2: TPanel;
-    sbtSair: TPngSpeedButton;
+    mmMenu: TMainMenu;
+    mniConsultas: TMenuItem;
+    mniPedidos: TMenuItem;
+    mniItens: TMenuItem;
+    mniSair: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure mniSairClick(Sender: TObject);
+    procedure mniPedidosClick(Sender: TObject);
+    procedure mniItensClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -76,7 +40,7 @@ var
 
 implementation
 
-uses objConexaoBanco;
+uses objConexaoBanco, uPedidos, uItens;
 
 {$R *.dfm}
 
@@ -92,6 +56,36 @@ var
 begin
   objConexao := TConexaoBanco.Create;
   Fconexao := objConexao.conexaoBanco;
+end;
+
+procedure TfPrincipal.mniItensClick(Sender: TObject);
+begin
+  try
+    fItens := TfItens.Create(Self);
+    fItens.Show;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao criar formulário de itens.' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
+procedure TfPrincipal.mniPedidosClick(Sender: TObject);
+begin
+  try
+    fPedidos := TfPedidos.Create(Self);
+    fPedidos.AtribuiConexao(Fconexao);
+    fPedidos.CarregarPedidos;
+    fPedidos.Show;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao criar formulário de pedidos.' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
+procedure TfPrincipal.mniSairClick(Sender: TObject);
+begin
+  if MessageDlg('Deseja encerrar o sistema?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+    Close;
 end;
 
 end.

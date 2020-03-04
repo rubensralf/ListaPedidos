@@ -30,18 +30,19 @@ type
       procedure setSituacao(const Value: Integer);
       procedure setValorTotal(const Value: Double);
 
-      function Salvar : Boolean;
-      function Editar : Boolean;
-      function Excluir : Boolean;
-      function AlterarSituacao(novaSituacao : Integer) : Boolean;
-      function AtualizarValorTotal(novoValorTotal : Double) : Boolean;
-
     public
       property numero : Integer read getNumero write setNumero;
       property data : TDate read getData write setData;
       property descricao : String read getDescricao write setDescricao;
       property situacao : Integer read getSituacao write setSituacao;
       property valorTotal : Double read getValorTotal write setValorTotal;
+
+      function Salvar : Boolean;
+      function Editar : Boolean;
+      function Excluir : Boolean;
+      function AlterarSituacao(novaSituacao : Integer) : Boolean;
+      function AtualizarValorTotal(novoValorTotal : Double) : Boolean;
+      procedure CarregarPedidos(var quPedidos : TFDQuery; dataInicial, dataFinal : TDate);
 
       constructor Create(objConexao : TFDConnection);
       destructor Destroy;
@@ -51,6 +52,38 @@ type
 implementation
 
 { TPedido }
+
+procedure TPedido.CarregarPedidos(var quPedidos: TFDQuery; dataInicial, dataFinal : TDate);
+begin
+  try
+    quPedidos.Close;
+    quPedidos.SQL.Clear;
+    quPedidos.SQL.Add('SELECT *');
+    quPedidos.SQL.Add('FROM   PEDIDOS');
+    quPedidos.SQL.Add('WHERE  0 = 0');
+
+    if numero > 0 then
+    begin
+      quPedidos.SQL.Add('AND    NUMERO = :NUMERO');
+      quPedidos.Params.ParamByName('NUMERO').AsInteger := numero;
+    end;
+
+    quPedidos.SQL.Add('AND    DATA BETWEEN :DATAINICIAL AND :DATAFINAL');
+    quPedidos.Params.ParamByName('DATAINICIAL').AsDate := dataInicial;
+    quPedidos.Params.ParamByName('DATAFINAL').AsDate := dataFinal;
+
+    if situacao > 0 then
+    begin
+      quPedidos.SQL.Add('AND    SITUACAO = :SITUACAO');
+      quPedidos.Params.ParamByName('SITUACAO').AsInteger := situacao;
+    end;
+
+    quPedidos.Open;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao carregar pedidos!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
 
 constructor TPedido.Create(objConexao : TFDConnection);
 begin
@@ -140,7 +173,7 @@ begin
       result := True;
     except
       on e:Exception do
-        ShowMessage('Falha ao salvar pedido!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create('Falha ao salvar pedido!' + #13 + 'Erro: ' + e.Message);
     end;
   finally
     quInserir.Close;
@@ -177,7 +210,7 @@ begin
       result := True;
     except
       on e:Exception do
-        ShowMessage('Falha ao alterar pedido!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create('Falha ao alterar pedido!' + #13 + 'Erro: ' + e.Message);
     end;
   finally
     quEditar.Close;
@@ -209,7 +242,7 @@ begin
       result := True;
     except
       on e:Exception do
-        ShowMessage('Falha ao excluir o pedido e seus itens!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create('Falha ao excluir o pedido e seus itens!' + #13 + 'Erro: ' + e.Message);
     end;
   finally
     quExcluir.Close;
@@ -243,7 +276,7 @@ begin
       result := True;
     except
       on e:Exception do
-        ShowMessage('Falha ao alterar situação pedido!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create('Falha ao alterar situação pedido!' + #13 + 'Erro: ' + e.Message);
     end;
   finally
     quAlterarSituacao.Close;
@@ -277,7 +310,7 @@ begin
       result := True;
     except
       on e:Exception do
-        ShowMessage('Falha ao atualizar valor!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create('Falha ao atualizar valor!' + #13 + 'Erro: ' + e.Message);
     end;
   finally
     quAtualizarValor.Close;
