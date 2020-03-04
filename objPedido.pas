@@ -89,6 +89,7 @@ constructor TPedido.Create(objConexao : TFDConnection);
 begin
   inherited Create;
   Fconexao := objConexao;
+  situacao := 1;
 end;
 
 destructor TPedido.Destroy;
@@ -200,7 +201,6 @@ begin
       quEditar.SQL.Add('WHERE  NUMERO = :NUMERO');
       quEditar.Params.ParamByName('DATA').AsDate := data;
       quEditar.Params.ParamByName('DESCRICAO').AsString := descricao;
-      quEditar.Params.ParamByName('SITUACAO').AsInteger := situacao;
       quEditar.Params.ParamByName('NUMERO').AsInteger := numero;
       quEditar.ExecSQL;
 

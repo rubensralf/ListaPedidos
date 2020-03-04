@@ -15,27 +15,31 @@
   Visible = True
   WindowState = wsMaximized
   OnClose = FormClose
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object pnl3: TPanel
     Left = 0
-    Top = 431
+    Top = 474
     Width = 890
     Height = 15
-    Align = alBottom
+    Align = alTop
     BevelOuter = bvNone
     Color = clBlack
     ParentBackground = False
     TabOrder = 0
+    ExplicitTop = 431
   end
   object pnlFundoItens: TPanel
     Left = 0
-    Top = 446
+    Top = 489
     Width = 890
-    Height = 286
-    Align = alBottom
+    Height = 243
+    Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
+    ExplicitTop = 446
+    ExplicitHeight = 286
     object pnlItens: TPanel
       Left = 0
       Top = 0
@@ -54,9 +58,9 @@
       ParentFont = False
       TabOrder = 0
       object pnl6: TPanel
-        Left = 752
+        Left = 720
         Top = 0
-        Width = 138
+        Width = 170
         Height = 27
         Align = alRight
         BevelOuter = bvNone
@@ -67,6 +71,7 @@
         Font.Style = []
         ParentFont = False
         TabOrder = 0
+        ExplicitLeft = 730
         object sbtNovoItem: TPngSpeedButton
           Left = 8
           Top = 2
@@ -101,7 +106,7 @@
             44AE426082}
         end
         object sbtCancelarEdicaoItem: TPngSpeedButton
-          Left = 74
+          Left = 107
           Top = 2
           Width = 23
           Height = 22
@@ -123,7 +128,7 @@
             00000049454E44AE426082}
         end
         object sbtExcluirItem: TPngSpeedButton
-          Left = 107
+          Left = 140
           Top = 2
           Width = 23
           Height = 22
@@ -134,6 +139,24 @@
             61000000097048597300000B1300000B1301009A9C18000000264944415478DA
             6364A010308E1A30080DA827525F232E031A8834A0019701031F06A306900100
             2FAC02119CAEF2980000000049454E44AE426082}
+        end
+        object sbtConfirmarItemPedido: TPngSpeedButton
+          Left = 74
+          Top = 2
+          Width = 23
+          Height = 22
+          Enabled = False
+          Flat = True
+          PngImage.Data = {
+            89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
+            610000000473424954080808087C086488000000097048597300000B1300000B
+            1301009A9C18000000BE4944415478DA6364A010300E8401CC40FC0F88FF9363
+            803A10EF05E273401C0AC43F493100A4793F104B42F92B8138825803D480F800
+            926610D801C49E300340742510EB01710A107F21A0F9284833107F86195007C4
+            8D50F64120F606E2AF40AC0AD52C854D337220DE80FA1106409A0A80781B9AE6
+            6340EC01D38C6C80263480C49114FF67408DA563509B3F21070EB2026C86C0C0
+            71A8CD9FD025D063019B213835633300DD10ACCE2664000334406381B81339C0
+            4831806840B101004B852811B9C712AB0000000049454E44AE426082}
         end
       end
     end
@@ -203,11 +226,12 @@
       Left = 0
       Top = 95
       Width = 890
-      Height = 191
+      Height = 148
       Align = alClient
       BorderStyle = bsNone
       DataSource = dsItensPedido
       GradientEndColor = 14084566
+      Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
       TabOrder = 2
       TitleFont.Charset = DEFAULT_CHARSET
       TitleFont.Color = clWindowText
@@ -260,19 +284,20 @@
     Left = 0
     Top = 27
     Width = 890
-    Height = 404
-    Align = alClient
+    Height = 447
+    Align = alTop
     BevelOuter = bvNone
     TabOrder = 2
     object dbgPedidos: TDBGrid
       Left = 257
       Top = 129
       Width = 633
-      Height = 275
+      Height = 318
       Align = alClient
       BorderStyle = bsNone
       DataSource = dsPedidos
       GradientEndColor = 14084566
+      Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
       TabOrder = 0
       TitleFont.Charset = DEFAULT_CHARSET
       TitleFont.Color = clWindowText
@@ -330,50 +355,6 @@
       BevelOuter = bvNone
       ParentBackground = False
       TabOrder = 1
-      object lblData: TLabel
-        Left = 36
-        Top = 16
-        Width = 23
-        Height = 13
-        Caption = 'Data'
-      end
-      object lblDescricao: TLabel
-        Left = 13
-        Top = 40
-        Width = 46
-        Height = 13
-        Caption = 'Descri'#231#227'o'
-      end
-      object lblSituacao: TLabel
-        Left = 172
-        Top = 16
-        Width = 41
-        Height = 13
-        Caption = 'Situa'#231#227'o'
-      end
-      object mmoDescricaoPedido: TMemo
-        Left = 62
-        Top = 37
-        Width = 818
-        Height = 33
-        Enabled = False
-        MaxLength = 200
-        TabOrder = 0
-      end
-      object cbbSituacao: TComboBox
-        Left = 216
-        Top = 12
-        Width = 145
-        Height = 21
-        Ctl3D = False
-        Enabled = False
-        ParentCtl3D = False
-        TabOrder = 1
-        Items.Strings = (
-          '00 - Em an'#225'lise'
-          '01 - Aprovado'
-          '02 - Cancelado')
-      end
       object grpFiltro: TGroupBox
         Left = 0
         Top = 79
@@ -387,13 +368,14 @@
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
-        TabOrder = 2
-        object sbtTAtualizar: TPngSpeedButton
+        TabOrder = 0
+        object sbtTAtualizarPedidos: TPngSpeedButton
           Left = 608
           Top = 17
           Width = 23
           Height = 22
           Flat = True
+          OnClick = sbtTAtualizarPedidosClick
           PngImage.Data = {
             89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
             610000000473424954080808087C086488000000097048597300000B1300000B
@@ -471,10 +453,16 @@
           TabOrder = 0
         end
         object cbbFiltroSituacao: TComboBox
-          Left = 443
-          Top = 17
+          Left = 446
+          Top = 18
           Width = 145
           Height = 21
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
           TabOrder = 1
           Items.Strings = (
             '00 - Todos'
@@ -487,6 +475,7 @@
           Top = 17
           Width = 100
           Height = 21
+          Date = 43894.000000000000000000
           Time = 0.883298206019389900
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -501,6 +490,7 @@
           Top = 17
           Width = 100
           Height = 21
+          Date = 43894.000000000000000000
           Time = 0.883298206019389900
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -511,34 +501,71 @@
           TabOrder = 3
         end
       end
-      object dtpData: TDateTimePicker
-        Left = 62
-        Top = 12
-        Width = 100
-        Height = 21
-        Time = 0.883298206019389900
+      object pnlCamposPedidos: TPanel
+        Left = 0
+        Top = 0
+        Width = 890
+        Height = 79
+        Align = alClient
+        BevelOuter = bvNone
         Enabled = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 3
+        TabOrder = 1
+        ExplicitLeft = 280
+        ExplicitTop = 16
+        ExplicitWidth = 185
+        ExplicitHeight = 41
+        object lblData: TLabel
+          Left = 36
+          Top = 16
+          Width = 23
+          Height = 13
+          Caption = 'Data'
+        end
+        object lblDescricao: TLabel
+          Left = 13
+          Top = 40
+          Width = 46
+          Height = 13
+          Caption = 'Descri'#231#227'o'
+        end
+        object dtpData: TDateTimePicker
+          Left = 62
+          Top = 12
+          Width = 100
+          Height = 21
+          Date = 43894.000000000000000000
+          Time = 0.883298206019389900
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+        end
+        object mmoDescricaoPedido: TMemo
+          Left = 62
+          Top = 37
+          Width = 818
+          Height = 33
+          MaxLength = 200
+          TabOrder = 1
+        end
       end
     end
     object pnlPedidosCampos: TPanel
       Left = 0
       Top = 129
       Width = 257
-      Height = 275
+      Height = 318
       Align = alLeft
       BevelOuter = bvNone
       ParentBackground = False
       TabOrder = 2
+      ExplicitHeight = 275
       object lblValorBruto: TLabel
         Left = 96
-        Top = 37
+        Top = 40
         Width = 64
         Height = 16
         Caption = 'Valor Bruto'
@@ -551,7 +578,7 @@
       end
       object lblValorDesconto: TLabel
         Left = 85
-        Top = 109
+        Top = 126
         Width = 86
         Height = 16
         Caption = 'Valor Desconto'
@@ -564,7 +591,7 @@
       end
       object lblValorLiquido: TLabel
         Left = 91
-        Top = 181
+        Top = 212
         Width = 74
         Height = 16
         Caption = 'Valor L'#237'quido'
@@ -577,9 +604,9 @@
       end
       object pnlValorLiquido: TPanel
         Left = 16
-        Top = 53
+        Top = 56
         Width = 225
-        Height = 41
+        Height = 50
         BevelOuter = bvNone
         Caption = 'R$0,00'
         Color = 12961221
@@ -594,9 +621,9 @@
       end
       object pnl1: TPanel
         Left = 16
-        Top = 125
+        Top = 142
         Width = 225
-        Height = 41
+        Height = 50
         BevelOuter = bvNone
         Caption = 'R$0,00'
         Color = 12961221
@@ -611,9 +638,9 @@
       end
       object pnl2: TPanel
         Left = 16
-        Top = 197
+        Top = 228
         Width = 225
-        Height = 41
+        Height = 50
         BevelOuter = bvNone
         Caption = 'R$0,00'
         Color = 12961221
@@ -696,9 +723,9 @@
     ParentFont = False
     TabOrder = 4
     object pnl5: TPanel
-      Left = 752
+      Left = 720
       Top = 0
-      Width = 138
+      Width = 170
       Height = 27
       Align = alRight
       BevelOuter = bvNone
@@ -709,6 +736,7 @@
       Font.Style = []
       ParentFont = False
       TabOrder = 0
+      ExplicitLeft = 712
       object sbtNovoPedido: TPngSpeedButton
         Left = 8
         Top = 2
@@ -729,6 +757,7 @@
         Width = 23
         Height = 22
         Flat = True
+        OnClick = sbtEditarPedidoClick
         PngImage.Data = {
           89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
           610000000473424954080808087C086488000000097048597300000B1300000B
@@ -744,12 +773,13 @@
           44AE426082}
       end
       object sbtCancelarEdicaoPedido: TPngSpeedButton
-        Left = 74
+        Left = 107
         Top = 2
         Width = 23
         Height = 22
         Enabled = False
         Flat = True
+        OnClick = sbtCancelarEdicaoPedidoClick
         PngImage.Data = {
           89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
           610000000473424954080808087C086488000000097048597300000B1300000B
@@ -766,7 +796,7 @@
           00000049454E44AE426082}
       end
       object sbtExcluirPedido: TPngSpeedButton
-        Left = 107
+        Left = 140
         Top = 2
         Width = 23
         Height = 22
@@ -777,6 +807,25 @@
           61000000097048597300000B1300000B1301009A9C18000000264944415478DA
           6364A010308E1A30080DA827525F232E031A8834A0019701031F06A306900100
           2FAC02119CAEF2980000000049454E44AE426082}
+      end
+      object sbtConfirmarPedido: TPngSpeedButton
+        Left = 74
+        Top = 2
+        Width = 23
+        Height = 22
+        Enabled = False
+        Flat = True
+        OnClick = sbtConfirmarPedidoClick
+        PngImage.Data = {
+          89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
+          610000000473424954080808087C086488000000097048597300000B1300000B
+          1301009A9C18000000BE4944415478DA6364A010300E8401CC40FC0F88FF9363
+          803A10EF05E273401C0AC43F493100A4793F104B42F92B8138825803D480F800
+          926610D801C49E300340742510EB01710A107F21A0F9284833107F86195007C4
+          8D50F64120F606E2AF40AC0AD52C854D337220DE80FA1106409A0A80781B9AE6
+          6340EC01D38C6C80263480C49114FF67408DA563509B3F21070EB2026C86C0C0
+          71A8CD9FD025D063019B213835633300DD10ACCE2664000334406381B81339C0
+          4831806840B101004B852811B9C712AB0000000049454E44AE426082}
       end
     end
   end

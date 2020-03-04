@@ -33,13 +33,8 @@ type
     pnlPedidos: TPanel;
     dbgPedidos: TDBGrid;
     pnlCampos: TPanel;
-    lblData: TLabel;
-    lblDescricao: TLabel;
-    lblSituacao: TLabel;
-    mmoDescricaoPedido: TMemo;
-    cbbSituacao: TComboBox;
     grpFiltro: TGroupBox;
-    sbtTAtualizar: TPngSpeedButton;
+    sbtTAtualizarPedidos: TPngSpeedButton;
     lblNumero: TLabel;
     lblFiltroSituacao: TLabel;
     edtFiltroNumero: TEdit;
@@ -67,7 +62,6 @@ type
     dtpFiltroDataDe: TDateTimePicker;
     lblAté: TLabel;
     dtpFiltroDataAte: TDateTimePicker;
-    dtpData: TDateTimePicker;
     pnl5: TPanel;
     sbtNovoPedido: TPngSpeedButton;
     sbtEditarPedido: TPngSpeedButton;
@@ -78,14 +72,28 @@ type
     sbtEditarItem: TPngSpeedButton;
     sbtCancelarEdicaoItem: TPngSpeedButton;
     sbtExcluirItem: TPngSpeedButton;
+    pnlCamposPedidos: TPanel;
+    lblData: TLabel;
+    dtpData: TDateTimePicker;
+    lblDescricao: TLabel;
+    mmoDescricaoPedido: TMemo;
+    sbtConfirmarPedido: TPngSpeedButton;
+    sbtConfirmarItemPedido: TPngSpeedButton;
     procedure sbtExcluirPedidoClick(Sender: TObject);
     procedure sbtSairClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure sbtNovoPedidoClick(Sender: TObject);
+    procedure sbtEditarPedidoClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure sbtTAtualizarPedidosClick(Sender: TObject);
+    procedure sbtCancelarEdicaoPedidoClick(Sender: TObject);
+    procedure sbtConfirmarPedidoClick(Sender: TObject);
 
   private
     { Private declarations }
     Fconexao : TFDConnection;
+    novoPedido : Boolean;
+    alterarPedido : Boolean;
 
   public
     { Public declarations }
@@ -129,6 +137,11 @@ begin
   Close;
 end;
 
+procedure TfPedidos.sbtTAtualizarPedidosClick(Sender: TObject);
+begin
+  CarregarPedidos;
+end;
+
 procedure TfPedidos.CarregarPedidos;
 var
   objPedido : TPedido;
@@ -159,11 +172,100 @@ begin
   fPedidos := nil;
 end;
 
+procedure TfPedidos.FormCreate(Sender: TObject);
+begin
+  novoPedido := False;
+  alterarPedido := False;
+end;
+
+procedure TfPedidos.sbtCancelarEdicaoPedidoClick(Sender: TObject);
+begin
+  try
+    pnlCamposPedidos.Enabled := False;
+    grpFiltro.Enabled := True;
+    sbtConfirmarPedido.Enabled := False;
+    novoPedido := False;
+    alterarPedido := False;
+    sbtCancelarEdicaoPedido.Enabled := False;
+    sbtNovoPedido.Enabled := True;
+    sbtEditarPedido.Enabled := True;
+    sbtExcluirPedido.Enabled := True;
+    pnlFundoItens.Enabled := True;
+    dbgPedidos.Enabled := True;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao cancelar inserção/edição de pedido!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
+procedure TfPedidos.sbtConfirmarPedidoClick(Sender: TObject);
+var
+  objPedido : TPedido;
+begin
+  try
+    objPedido := TPedido.Create(Fconexao);
+
+    try
+      objPedido.data := dtpData.Date;
+      objPedido.descricao := mmoDescricaoPedido.Lines.Text;
+
+      if novoPedido then
+      begin
+        objPedido.situacao := 1; // 1 = Em análise
+
+        if objPedido.Salvar then
+          ShowMessage('Pedido salvo!');
+      end
+      else
+        if alterarPedido then
+        begin
+          objPedido.numero := quPedidos.FieldByName('NUMERO').AsInteger;
+
+          if objPedido.Editar then
+            ShowMessage('Pedido alterado!');
+        end;
+
+      sbtCancelarEdicaoPedidoClick(Self);
+      sbtTAtualizarPedidosClick(Self);
+    except
+      on e:Exception do
+        ShowMessage('Erro ao salvar pedido.' + #13 + 'Erro: ' + e.Message);
+    end;
+  finally
+    objPedido.Destroy;
+  end;
+end;
+
+procedure TfPedidos.sbtEditarPedidoClick(Sender: TObject);
+begin
+  try
+    pnlCamposPedidos.Enabled := True;
+    grpFiltro.Enabled := False;
+    sbtConfirmarPedido.Enabled := True;
+    alterarPedido := True;
+    sbtCancelarEdicaoPedido.Enabled := True;
+    sbtEditarPedido.Enabled := False;
+    sbtNovoPedido.Enabled := False;
+    sbtExcluirPedido.Enabled := False;
+    pnlFundoItens.Enabled := False;
+    dbgPedidos.Enabled := False;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao habilitar edição de pedido!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
 procedure TfPedidos.sbtExcluirPedidoClick(Sender: TObject);
 var
   objPedido : TPedido;
   objItensPedido : TItemPedido;
 begin
+  if quPedidos.FieldByName('NUMERO').AsInteger <= 0 then
+  begin
+    ShowMessage('Um pedido deve ser selecionado para exclusão.');
+    Exit;
+  end;
+
   if MessageDlg('Deseja excluir o pedido ' + IntToStr(quPedidos.FieldByName('NUMERO').AsInteger) + ' e seus itens?', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
     Exit;
 
@@ -202,23 +304,21 @@ begin
 end;
 
 procedure TfPedidos.sbtNovoPedidoClick(Sender: TObject);
-var
-  objPedido : TPedido;
 begin
   try
-    objPedido := TPedido.Create(Fconexao);
-
-    try
-      objPedido.data := dtpData.Date;
-      objPedido.descricao := mmoDescricaoPedido.Lines.Text;
-      objPedido.situacao := 1; // 1 = Em análise
-      objPedido.Salvar;
-    except
-      on e:Exception do
-        ShowMessage('Erro ao salvar pedido.' + #13 + 'Erro: ' + e.Message);
-    end;
-  finally
-    objPedido.Destroy;
+    pnlCamposPedidos.Enabled := True;
+    grpFiltro.Enabled := False;
+    sbtConfirmarPedido.Enabled := True;
+    novoPedido := True;
+    sbtCancelarEdicaoPedido.Enabled := True;
+    sbtNovoPedido.Enabled := False;
+    sbtEditarPedido.Enabled := False;
+    sbtExcluirPedido.Enabled := False;
+    pnlFundoItens.Enabled := False;
+    dbgPedidos.Enabled := False;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao habilitar edição de pedido!' + #13 + 'Erro: ' + e.Message);
   end;
 end;
 
