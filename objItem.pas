@@ -107,7 +107,7 @@ begin
       result := True;
     except
       on e:Exception do
-        ShowMessage('Falha ao salvar item!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create(e.Message);
     end;
   finally
     quInserir.Close;
@@ -143,7 +143,7 @@ begin
       result := True;
     except
       on e:Exception do
-        ShowMessage('Falha ao alterar item!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create(e.Message);
     end;
   finally
     quEditar.Close;
@@ -175,7 +175,7 @@ begin
       result := True;
     except
       on e:Exception do
-        ShowMessage('Falha ao excluir item!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create(e.Message);
     end;
   finally
     quExcluir.Close;

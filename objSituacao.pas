@@ -74,7 +74,7 @@ begin
     quSituacoes.Open;
   except
     on e:Exception do
-      raise Exception.Create('Falha ao retornar situações' + #13 + 'Erro: ' + e.Message);
+      raise Exception.Create(e.Message);
   end;
 end;
 

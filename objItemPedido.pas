@@ -140,7 +140,7 @@ begin
       result := True;
     except
       on e:Exception do
-        ShowMessage('Falha ao salvar item do pedido!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create(e.Message);
     end;
   finally
     quInserir.Close;
@@ -180,7 +180,7 @@ begin
       result := True;
     except
       on e:Exception do
-        ShowMessage('Falha ao alterar item do pedido!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create(e.Message);
     end;
   finally
     quEditar.Close;
@@ -214,7 +214,7 @@ begin
       result := True;
     except
       on e:Exception do
-        ShowMessage('Falha ao excluir item do pedido!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create(e.Message);
     end;
   finally
     quExcluir.Close;
@@ -246,7 +246,7 @@ begin
       result := True;
     except
       on e:Exception do
-        raise Exception.Create('Falha ao excluir itens do pedido!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create(e.Message);
     end;
   finally
     quExcluir.Close;
@@ -277,7 +277,7 @@ begin
         result := true;
     except
       on e:Exception do
-        raise Exception.Create('Falha ao verificar se pedido possui itens!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create(e.Message);
     end;
   finally
     quItensPedido.Close;

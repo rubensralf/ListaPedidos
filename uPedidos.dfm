@@ -3,7 +3,7 @@
   Top = 0
   Caption = 'Pedidos'
   ClientHeight = 756
-  ClientWidth = 890
+  ClientWidth = 932
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,30 +20,32 @@
   TextHeight = 13
   object pnl3: TPanel
     Left = 0
-    Top = 474
-    Width = 890
+    Top = 521
+    Width = 932
     Height = 15
     Align = alTop
     BevelOuter = bvNone
     Color = clBlack
     ParentBackground = False
     TabOrder = 0
-    ExplicitTop = 431
+    ExplicitTop = 474
+    ExplicitWidth = 890
   end
   object pnlFundoItens: TPanel
     Left = 0
-    Top = 489
-    Width = 890
-    Height = 243
+    Top = 536
+    Width = 932
+    Height = 196
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitTop = 446
-    ExplicitHeight = 286
+    ExplicitTop = 489
+    ExplicitWidth = 890
+    ExplicitHeight = 243
     object pnlItens: TPanel
       Left = 0
       Top = 0
-      Width = 890
+      Width = 932
       Height = 27
       Align = alTop
       BevelOuter = bvNone
@@ -57,8 +59,9 @@
       ParentBackground = False
       ParentFont = False
       TabOrder = 0
+      ExplicitWidth = 890
       object pnl6: TPanel
-        Left = 720
+        Left = 762
         Top = 0
         Width = 170
         Height = 27
@@ -71,7 +74,7 @@
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitLeft = 730
+        ExplicitLeft = 720
         object sbtNovoItem: TPngSpeedButton
           Left = 8
           Top = 2
@@ -163,12 +166,13 @@
     object pnlDadosItens: TPanel
       Left = 0
       Top = 27
-      Width = 890
+      Width = 932
       Height = 68
       Align = alTop
       BevelOuter = bvNone
       ParentBackground = False
       TabOrder = 1
+      ExplicitWidth = 890
       object lblItem: TLabel
         Left = 47
         Top = 15
@@ -225,8 +229,8 @@
     object dbgItensPedido: TDBGrid
       Left = 0
       Top = 95
-      Width = 890
-      Height = 148
+      Width = 932
+      Height = 101
       Align = alClient
       BorderStyle = bsNone
       DataSource = dsItensPedido
@@ -283,16 +287,17 @@
   object pnlPedidos: TPanel
     Left = 0
     Top = 27
-    Width = 890
-    Height = 447
+    Width = 932
+    Height = 494
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 2
+    ExplicitWidth = 890
     object dbgPedidos: TDBGrid
       Left = 257
       Top = 129
-      Width = 633
-      Height = 318
+      Width = 675
+      Height = 365
       Align = alClient
       BorderStyle = bsNone
       DataSource = dsPedidos
@@ -304,6 +309,7 @@
       TitleFont.Height = -11
       TitleFont.Name = 'Tahoma'
       TitleFont.Style = []
+      OnCellClick = dbgPedidosCellClick
       Columns = <
         item
           Expanded = False
@@ -349,16 +355,17 @@
     object pnlCampos: TPanel
       Left = 0
       Top = 0
-      Width = 890
+      Width = 932
       Height = 124
       Align = alTop
       BevelOuter = bvNone
       ParentBackground = False
       TabOrder = 1
+      ExplicitWidth = 890
       object grpFiltro: TGroupBox
         Left = 0
         Top = 79
-        Width = 890
+        Width = 932
         Height = 45
         Align = alBottom
         Caption = 'Filtros '
@@ -369,6 +376,7 @@
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 0
+        ExplicitWidth = 890
         object sbtTAtualizarPedidos: TPngSpeedButton
           Left = 608
           Top = 17
@@ -462,8 +470,10 @@
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
+          ItemIndex = 0
           ParentFont = False
           TabOrder = 1
+          Text = '00 - Todos'
           Items.Strings = (
             '00 - Todos'
             '01 - Em an'#225'lise'
@@ -504,16 +514,13 @@
       object pnlCamposPedidos: TPanel
         Left = 0
         Top = 0
-        Width = 890
+        Width = 932
         Height = 79
         Align = alClient
         BevelOuter = bvNone
         Enabled = False
         TabOrder = 1
-        ExplicitLeft = 280
-        ExplicitTop = 16
-        ExplicitWidth = 185
-        ExplicitHeight = 41
+        ExplicitWidth = 890
         object lblData: TLabel
           Left = 36
           Top = 16
@@ -557,15 +564,15 @@
       Left = 0
       Top = 129
       Width = 257
-      Height = 318
+      Height = 365
       Align = alLeft
       BevelOuter = bvNone
       ParentBackground = False
       TabOrder = 2
-      ExplicitHeight = 275
+      ExplicitHeight = 318
       object lblValorBruto: TLabel
         Left = 96
-        Top = 40
+        Top = 63
         Width = 64
         Height = 16
         Caption = 'Valor Bruto'
@@ -578,7 +585,7 @@
       end
       object lblValorDesconto: TLabel
         Left = 85
-        Top = 126
+        Top = 149
         Width = 86
         Height = 16
         Caption = 'Valor Desconto'
@@ -591,7 +598,7 @@
       end
       object lblValorLiquido: TLabel
         Left = 91
-        Top = 212
+        Top = 235
         Width = 74
         Height = 16
         Caption = 'Valor L'#237'quido'
@@ -604,7 +611,7 @@
       end
       object pnlValorLiquido: TPanel
         Left = 16
-        Top = 56
+        Top = 79
         Width = 225
         Height = 50
         BevelOuter = bvNone
@@ -621,7 +628,7 @@
       end
       object pnl1: TPanel
         Left = 16
-        Top = 142
+        Top = 165
         Width = 225
         Height = 50
         BevelOuter = bvNone
@@ -638,7 +645,7 @@
       end
       object pnl2: TPanel
         Left = 16
-        Top = 228
+        Top = 251
         Width = 225
         Height = 50
         BevelOuter = bvNone
@@ -659,33 +666,36 @@
     object pnl4: TPanel
       Left = 0
       Top = 124
-      Width = 890
+      Width = 932
       Height = 5
       Align = alTop
       BevelOuter = bvNone
       Color = clBlack
       ParentBackground = False
       TabOrder = 3
+      ExplicitWidth = 890
     end
   end
   object pnlSair: TPanel
     Left = 0
     Top = 732
-    Width = 890
+    Width = 932
     Height = 24
     Align = alBottom
     BevelOuter = bvNone
     Color = 12961221
     ParentBackground = False
     TabOrder = 3
+    ExplicitWidth = 890
     object pnlSair2: TPanel
-      Left = 869
+      Left = 911
       Top = 0
       Width = 21
       Height = 24
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 0
+      ExplicitLeft = 869
       object sbtSair: TPngSpeedButton
         Left = -1
         Top = 1
@@ -708,7 +718,7 @@
   object pnlTituloPedidos: TPanel
     Left = 0
     Top = 0
-    Width = 890
+    Width = 932
     Height = 27
     Align = alTop
     BevelOuter = bvNone
@@ -722,8 +732,9 @@
     ParentBackground = False
     ParentFont = False
     TabOrder = 4
+    ExplicitWidth = 890
     object pnl5: TPanel
-      Left = 720
+      Left = 762
       Top = 0
       Width = 170
       Height = 27
@@ -736,7 +747,7 @@
       Font.Style = []
       ParentFont = False
       TabOrder = 0
-      ExplicitLeft = 712
+      ExplicitLeft = 720
       object sbtNovoPedido: TPngSpeedButton
         Left = 8
         Top = 2
@@ -870,8 +881,8 @@
         'IGO, ITEM.DESCRICAO '
       'FROM   ITENSPEDIDO IPED'
       '       INNER JOIN ITENS ITEM ON ITEM.CODIGO = IPED.CODIGOITEM')
-    Left = 176
-    Top = 608
+    Left = 144
+    Top = 672
     object quItensPedidoquantidade: TSmallintField
       FieldName = 'quantidade'
       Origin = 'quantidade'
@@ -902,7 +913,7 @@
   end
   object dsItensPedido: TDataSource
     DataSet = quItensPedido
-    Left = 256
-    Top = 608
+    Left = 232
+    Top = 672
   end
 end

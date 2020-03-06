@@ -53,43 +53,10 @@ implementation
 
 { TPedido }
 
-procedure TPedido.CarregarPedidos(var quPedidos: TFDQuery; dataInicial, dataFinal : TDate);
-begin
-  try
-    quPedidos.Close;
-    quPedidos.SQL.Clear;
-    quPedidos.SQL.Add('SELECT *');
-    quPedidos.SQL.Add('FROM   PEDIDOS');
-    quPedidos.SQL.Add('WHERE  0 = 0');
-
-    if numero > 0 then
-    begin
-      quPedidos.SQL.Add('AND    NUMERO = :NUMERO');
-      quPedidos.Params.ParamByName('NUMERO').AsInteger := numero;
-    end;
-
-    quPedidos.SQL.Add('AND    DATA BETWEEN :DATAINICIAL AND :DATAFINAL');
-    quPedidos.Params.ParamByName('DATAINICIAL').AsDate := dataInicial;
-    quPedidos.Params.ParamByName('DATAFINAL').AsDate := dataFinal;
-
-    if situacao > 0 then
-    begin
-      quPedidos.SQL.Add('AND    SITUACAO = :SITUACAO');
-      quPedidos.Params.ParamByName('SITUACAO').AsInteger := situacao;
-    end;
-
-    quPedidos.Open;
-  except
-    on e:Exception do
-      ShowMessage('Erro ao carregar pedidos!' + #13 + 'Erro: ' + e.Message);
-  end;
-end;
-
 constructor TPedido.Create(objConexao : TFDConnection);
 begin
   inherited Create;
   Fconexao := objConexao;
-  situacao := 1;
 end;
 
 destructor TPedido.Destroy;
@@ -147,6 +114,38 @@ begin
   FvalorTotal := Value;
 end;
 
+procedure TPedido.CarregarPedidos(var quPedidos: TFDQuery; dataInicial, dataFinal : TDate);
+begin
+  try
+    quPedidos.Close;
+    quPedidos.SQL.Clear;
+    quPedidos.SQL.Add('SELECT *');
+    quPedidos.SQL.Add('FROM   PEDIDOS');
+    quPedidos.SQL.Add('WHERE  0 = 0');
+
+    if numero > 0 then
+    begin
+      quPedidos.SQL.Add('AND    NUMERO = :NUMERO');
+      quPedidos.Params.ParamByName('NUMERO').AsInteger := numero;
+    end;
+
+    quPedidos.SQL.Add('AND    DATA BETWEEN :DATAINICIAL AND :DATAFINAL');
+    quPedidos.Params.ParamByName('DATAINICIAL').AsDate := dataInicial;
+    quPedidos.Params.ParamByName('DATAFINAL').AsDate := dataFinal;
+
+    if situacao > 0 then
+    begin
+      quPedidos.SQL.Add('AND    SITUACAO = :SITUACAO');
+      quPedidos.Params.ParamByName('SITUACAO').AsInteger := situacao;
+    end;
+
+    quPedidos.Open;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao carregar pedidos!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
 function TPedido.Salvar : Boolean;
 var
   quInserir : TFDQuery;
@@ -174,7 +173,7 @@ begin
       result := True;
     except
       on e:Exception do
-        raise Exception.Create('Falha ao salvar pedido!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create(e.Message);
     end;
   finally
     quInserir.Close;
@@ -210,7 +209,7 @@ begin
       result := True;
     except
       on e:Exception do
-        raise Exception.Create('Falha ao alterar pedido!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create(e.Message);
     end;
   finally
     quEditar.Close;
@@ -242,7 +241,7 @@ begin
       result := True;
     except
       on e:Exception do
-        raise Exception.Create('Falha ao excluir o pedido e seus itens!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create(e.Message);
     end;
   finally
     quExcluir.Close;
@@ -276,7 +275,7 @@ begin
       result := True;
     except
       on e:Exception do
-        raise Exception.Create('Falha ao alterar situação pedido!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create(e.Message);
     end;
   finally
     quAlterarSituacao.Close;
@@ -310,7 +309,7 @@ begin
       result := True;
     except
       on e:Exception do
-        raise Exception.Create('Falha ao atualizar valor!' + #13 + 'Erro: ' + e.Message);
+        raise Exception.Create(e.Message);
     end;
   finally
     quAtualizarValor.Close;
