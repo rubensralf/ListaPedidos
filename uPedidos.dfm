@@ -2,7 +2,7 @@
   Left = 0
   Top = 0
   Caption = 'Pedidos'
-  ClientHeight = 756
+  ClientHeight = 809
   ClientWidth = 932
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -35,7 +35,7 @@
     Left = 0
     Top = 536
     Width = 932
-    Height = 196
+    Height = 249
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
@@ -230,7 +230,7 @@
       Left = 0
       Top = 95
       Width = 932
-      Height = 101
+      Height = 154
       Align = alClient
       BorderStyle = bsNone
       DataSource = dsItensPedido
@@ -678,7 +678,7 @@
   end
   object pnlSair: TPanel
     Left = 0
-    Top = 732
+    Top = 785
     Width = 932
     Height = 24
     Align = alBottom
@@ -686,6 +686,7 @@
     Color = 12961221
     ParentBackground = False
     TabOrder = 3
+    ExplicitTop = 732
     ExplicitWidth = 890
     object pnlSair2: TPanel
       Left = 911
