@@ -42,6 +42,8 @@ type
       function ExcluirItensPorPedido : Boolean;
       function PossuiItens : Boolean;
 
+      procedure CarregarItensPedido(var quItensPedido : TFDQuery);
+
       constructor Create(objConexao : TFDConnection);
       destructor Destroy;
 
@@ -99,6 +101,25 @@ end;
 procedure TItemPedido.setValorTotal(const Value: Double);
 begin
   FvalorTotal := Value;
+end;
+
+procedure TItemPedido.CarregarItensPedido(var quItensPedido: TFDQuery);
+begin
+  try
+    quItensPedido.Close;
+    quItensPedido.SQL.Clear;
+    quItensPedido.SQL.Add('SELECT ITPED.NUMEROPEDIDO, ITPED.CODIGOITEM, ITPED.QUANTIDADE, ITPED.DESCONTO,');
+    quItensPedido.SQL.Add('       ITEM.VALOR AS VALORITEM, ITPED.VALORTOTAL, ITEM.DESCRICAO');
+    quItensPedido.SQL.Add('FROM   ITENSPEDIDO ITPED');
+    quItensPedido.SQL.Add('       INNER JOIN ITENS ITEM ON ITEM.CODIGO = ITPED.CODIGOITEM');
+    quItensPedido.SQL.Add('WHERE  NUMEROPEDIDO = :NUMEROPEDIDO');
+    quItensPedido.SQL.Add('ORDER  BY CODIGOITEM');
+    quItensPedido.Params.ParamByName('NUMEROPEDIDO').AsInteger := numeroPedido;
+    quItensPedido.Open;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao carregar itens do pedido!' + #13 + 'Erro: ' + e.Message);
+  end;
 end;
 
 constructor TItemPedido.Create(objConexao: TFDConnection);

@@ -28,8 +28,6 @@
     Color = clBlack
     ParentBackground = False
     TabOrder = 0
-    ExplicitTop = 474
-    ExplicitWidth = 890
   end
   object pnlFundoItens: TPanel
     Left = 0
@@ -38,10 +36,8 @@
     Height = 249
     Align = alClient
     BevelOuter = bvNone
+    Enabled = False
     TabOrder = 1
-    ExplicitTop = 489
-    ExplicitWidth = 890
-    ExplicitHeight = 243
     object pnlItens: TPanel
       Left = 0
       Top = 0
@@ -59,7 +55,7 @@
       ParentBackground = False
       ParentFont = False
       TabOrder = 0
-      ExplicitWidth = 890
+      ExplicitTop = 5
       object pnl6: TPanel
         Left = 762
         Top = 0
@@ -74,13 +70,13 @@
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitLeft = 720
         object sbtNovoItem: TPngSpeedButton
           Left = 8
           Top = 2
           Width = 23
           Height = 22
           Flat = True
+          OnClick = sbtNovoItemClick
           PngImage.Data = {
             89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
             610000000473424954080808087C086488000000097048597300000B1300000B
@@ -94,6 +90,7 @@
           Width = 23
           Height = 22
           Flat = True
+          OnClick = sbtEditarItemClick
           PngImage.Data = {
             89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
             610000000473424954080808087C086488000000097048597300000B1300000B
@@ -115,6 +112,7 @@
           Height = 22
           Enabled = False
           Flat = True
+          OnClick = sbtCancelarEdicaoItemClick
           PngImage.Data = {
             89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
             610000000473424954080808087C086488000000097048597300000B1300000B
@@ -136,7 +134,7 @@
           Width = 23
           Height = 22
           Flat = True
-          OnClick = sbtExcluirPedidoClick
+          OnClick = sbtExcluirItemClick
           PngImage.Data = {
             89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
             61000000097048597300000B1300000B1301009A9C18000000264944415478DA
@@ -170,9 +168,10 @@
       Height = 68
       Align = alTop
       BevelOuter = bvNone
+      Enabled = False
       ParentBackground = False
       TabOrder = 1
-      ExplicitWidth = 890
+      ExplicitTop = 30
       object lblItem: TLabel
         Left = 47
         Top = 15
@@ -245,18 +244,31 @@
       Columns = <
         item
           Expanded = False
-          FieldName = 'codigo'
+          FieldName = 'codigoItem'
           Title.Alignment = taRightJustify
           Title.Caption = 'Item'
-          Width = 65
+          Width = 80
           Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'numeroPedido'
+          Visible = False
         end
         item
           Expanded = False
           FieldName = 'quantidade'
           Title.Alignment = taRightJustify
           Title.Caption = 'Qtd.'
-          Width = 40
+          Width = 50
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'valoritem'
+          Title.Alignment = taRightJustify
+          Title.Caption = 'Vlr. Item'
+          Width = 100
           Visible = True
         end
         item
@@ -264,7 +276,7 @@
           FieldName = 'desconto'
           Title.Alignment = taRightJustify
           Title.Caption = 'Vlr. Desconto'
-          Width = 80
+          Width = 100
           Visible = True
         end
         item
@@ -272,14 +284,14 @@
           FieldName = 'valorTotal'
           Title.Alignment = taRightJustify
           Title.Caption = 'Vlr. Total'
-          Width = 80
+          Width = 100
           Visible = True
         end
         item
           Expanded = False
           FieldName = 'descricao'
           Title.Caption = 'Descri'#231#227'o'
-          Width = 607
+          Width = 600
           Visible = True
         end>
     end
@@ -292,7 +304,6 @@
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitWidth = 890
     object dbgPedidos: TDBGrid
       Left = 257
       Top = 129
@@ -330,17 +341,9 @@
         end
         item
           Expanded = False
-          FieldName = 'descricao'
-          Title.Caption = 'Descri'#231#227'o'
-          Width = 337
-          Visible = True
-        end
-        item
-          Alignment = taLeftJustify
-          Expanded = False
-          FieldName = 'situacao'
+          FieldName = 'situacao_fmt'
           Title.Caption = 'Situa'#231#227'o'
-          Width = 70
+          Width = 100
           Visible = True
         end
         item
@@ -348,8 +351,23 @@
           FieldName = 'valorTotal'
           Title.Alignment = taRightJustify
           Title.Caption = 'Vlr. Total'
-          Width = 80
+          Width = 100
           Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'descricao'
+          Title.Caption = 'Descri'#231#227'o'
+          Width = 600
+          Visible = True
+        end
+        item
+          Alignment = taLeftJustify
+          Expanded = False
+          FieldName = 'situacao'
+          Title.Caption = 'Situa'#231#227'o'
+          Width = -1
+          Visible = False
         end>
     end
     object pnlCampos: TPanel
@@ -361,7 +379,6 @@
       BevelOuter = bvNone
       ParentBackground = False
       TabOrder = 1
-      ExplicitWidth = 890
       object grpFiltro: TGroupBox
         Left = 0
         Top = 79
@@ -376,7 +393,6 @@
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 0
-        ExplicitWidth = 890
         object sbtTAtualizarPedidos: TPngSpeedButton
           Left = 608
           Top = 17
@@ -520,7 +536,6 @@
         BevelOuter = bvNone
         Enabled = False
         TabOrder = 1
-        ExplicitWidth = 890
         object lblData: TLabel
           Left = 36
           Top = 16
@@ -569,7 +584,6 @@
       BevelOuter = bvNone
       ParentBackground = False
       TabOrder = 2
-      ExplicitHeight = 318
       object lblValorBruto: TLabel
         Left = 96
         Top = 63
@@ -609,7 +623,7 @@
         Font.Style = []
         ParentFont = False
       end
-      object pnlValorLiquido: TPanel
+      object pnlValorBruto: TPanel
         Left = 16
         Top = 79
         Width = 225
@@ -626,7 +640,7 @@
         ParentFont = False
         TabOrder = 0
       end
-      object pnl1: TPanel
+      object pnlValorDesconto: TPanel
         Left = 16
         Top = 165
         Width = 225
@@ -643,7 +657,7 @@
         ParentFont = False
         TabOrder = 1
       end
-      object pnl2: TPanel
+      object pnlValorLiquido: TPanel
         Left = 16
         Top = 251
         Width = 225
@@ -673,7 +687,6 @@
       Color = clBlack
       ParentBackground = False
       TabOrder = 3
-      ExplicitWidth = 890
     end
   end
   object pnlSair: TPanel
@@ -686,8 +699,6 @@
     Color = 12961221
     ParentBackground = False
     TabOrder = 3
-    ExplicitTop = 732
-    ExplicitWidth = 890
     object pnlSair2: TPanel
       Left = 911
       Top = 0
@@ -696,7 +707,6 @@
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 0
-      ExplicitLeft = 869
       object sbtSair: TPngSpeedButton
         Left = -1
         Top = 1
@@ -733,7 +743,6 @@
     ParentBackground = False
     ParentFont = False
     TabOrder = 4
-    ExplicitWidth = 890
     object pnl5: TPanel
       Left = 762
       Top = 0
@@ -748,7 +757,6 @@
       Font.Style = []
       ParentFont = False
       TabOrder = 0
-      ExplicitLeft = 720
       object sbtNovoPedido: TPngSpeedButton
         Left = 8
         Top = 2
@@ -842,8 +850,15 @@
     end
   end
   object quPedidos: TFDQuery
+    Connection = con1
     SQL.Strings = (
-      'select * from pedidos')
+      
+        'select ped.numero, ped.data, ped.descricao, ped.situacao, ped.va' +
+        'lortotal, sit.descricao as situacao_fmt'
+      'from   pedidos ped'
+      '       inner join situacoes sit on sit.codigo = ped.situacao'
+      'where  0 = 0'
+      'order  by ped.numero desc')
     Left = 408
     Top = 272
     object quPedidosnumero: TFDAutoIncField
@@ -865,9 +880,20 @@
       FieldName = 'situacao'
       Origin = 'situacao'
     end
+    object quPedidossituacao_fmt: TStringField
+      AutoGenerateValue = arDefault
+      FieldName = 'situacao_fmt'
+      Origin = 'descricao'
+      ProviderFlags = []
+      ReadOnly = True
+      Size = 50
+    end
     object quPedidosvalorTotal: TFloatField
+      DisplayWidth = 1
       FieldName = 'valorTotal'
       Origin = 'valorTotal'
+      DisplayFormat = '##,###,##0.00'
+      Precision = 2
     end
   end
   object dsPedidos: TDataSource
@@ -876,12 +902,15 @@
     Top = 272
   end
   object quItensPedido: TFDQuery
+    Connection = con1
     SQL.Strings = (
       
-        'SELECT IPED.QUANTIDADE, IPED.DESCONTO, IPED.VALORTOTAL, ITEM.COD' +
-        'IGO, ITEM.DESCRICAO '
-      'FROM   ITENSPEDIDO IPED'
-      '       INNER JOIN ITENS ITEM ON ITEM.CODIGO = IPED.CODIGOITEM')
+        'select itped.numeropedido, itped.codigoitem, itped.quantidade, i' +
+        'tped.desconto, item.valor as valoritem, itped.valortotal, item.d' +
+        'escricao'
+      'from   itenspedido itped'
+      '       inner join itens item on item.codigo = itped.codigoitem'
+      'where  0 = 0')
     Left = 144
     Top = 672
     object quItensPedidoquantidade: TSmallintField
@@ -896,12 +925,14 @@
       FieldName = 'valorTotal'
       Origin = 'valorTotal'
     end
-    object quItensPedidocodigo: TIntegerField
-      AutoGenerateValue = arDefault
-      FieldName = 'codigo'
-      Origin = 'codigo'
-      ProviderFlags = []
-      ReadOnly = True
+    object quItensPedidonumeroPedido: TIntegerField
+      FieldName = 'numeroPedido'
+      Origin = 'numeroPedido'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+    end
+    object quItensPedidocodigoItem: TIntegerField
+      FieldName = 'codigoItem'
+      Origin = 'codigoItem'
     end
     object quItensPedidodescricao: TStringField
       AutoGenerateValue = arDefault
@@ -911,10 +942,26 @@
       ReadOnly = True
       Size = 200
     end
+    object quItensPedidovaloritem: TFloatField
+      AutoGenerateValue = arDefault
+      FieldName = 'valoritem'
+      Origin = 'valor'
+      ProviderFlags = []
+      ReadOnly = True
+    end
   end
   object dsItensPedido: TDataSource
     DataSet = quItensPedido
     Left = 232
     Top = 672
+  end
+  object con1: TFDConnection
+    Params.Strings = (
+      'Database=D:\Git\ListaPedidos\pedidos.db'
+      'DriverID=SQLite')
+    Connected = True
+    LoginPrompt = False
+    Left = 504
+    Top = 419
   end
 end

@@ -119,25 +119,28 @@ begin
   try
     quPedidos.Close;
     quPedidos.SQL.Clear;
-    quPedidos.SQL.Add('SELECT *');
-    quPedidos.SQL.Add('FROM   PEDIDOS');
+    quPedidos.SQL.Add('SELECT PED.NUMERO, PED.DATA, PED.DESCRICAO, PED.SITUACAO, PED.VALORTOTAL, SIT.DESCRICAO AS SITUACAO_FMT');
+    quPedidos.SQL.Add('FROM   PEDIDOS PED');
+    quPedidos.SQL.Add('       INNER JOIN SITUACOES SIT ON SIT.CODIGO = PED.SITUACAO');
     quPedidos.SQL.Add('WHERE  0 = 0');
 
     if numero > 0 then
     begin
-      quPedidos.SQL.Add('AND    NUMERO = :NUMERO');
+      quPedidos.SQL.Add('AND    PED.NUMERO = :NUMERO');
       quPedidos.Params.ParamByName('NUMERO').AsInteger := numero;
     end;
 
-    quPedidos.SQL.Add('AND    DATA BETWEEN :DATAINICIAL AND :DATAFINAL');
+    quPedidos.SQL.Add('AND    PED.DATA BETWEEN :DATAINICIAL AND :DATAFINAL');
     quPedidos.Params.ParamByName('DATAINICIAL').AsDate := dataInicial;
     quPedidos.Params.ParamByName('DATAFINAL').AsDate := dataFinal;
 
     if situacao > 0 then
     begin
-      quPedidos.SQL.Add('AND    SITUACAO = :SITUACAO');
+      quPedidos.SQL.Add('AND    PED.SITUACAO = :SITUACAO');
       quPedidos.Params.ParamByName('SITUACAO').AsInteger := situacao;
     end;
+
+    quPedidos.SQL.Add('ORDER  BY PED.NUMERO DESC');
 
     quPedidos.Open;
   except
