@@ -36,7 +36,7 @@ begin
   FconexaoBanco.Connected := False;
   FconexaoBanco.LoginPrompt := False;
   FconexaoBanco.Params.DriverID := 'SQLite';
-  FconexaoBanco.Params.Database := ExtractFileDir(Application.ExeName) + '\pedidos.db';
+  FconexaoBanco.Params.Database := ExtractFileDir(Application.ExeName) + '\database.db';
   FconexaoBanco.Connected := True;
 end;
 

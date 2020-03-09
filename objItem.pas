@@ -11,6 +11,7 @@ type
       Fcodigo: Integer;
       Fdescricao: String;
       Fvalor : Double;
+      Fativo : Boolean;
       Fconexao : TFDConnection;
 
       const tabelaItem : String = 'ITENS';
@@ -19,14 +20,17 @@ type
       function getCodigo : Integer;
       function getDescricao : String;
       function getValor : Double;
+      function getAtivo : Boolean;
       procedure setCodigo(const Value: Integer);
       procedure setDescricao(const Value: String);
       procedure setValor(const Value: Double);
+      procedure setAtivo(const Value: Boolean);
 
     public
       property codigo : Integer read getCodigo write setCodigo;
       property descricao : String read getDescricao write setDescricao;
       property valor : Double read getValor write setValor;
+      property ativo : Boolean read getAtivo write setAtivo;
 
       function Salvar : Boolean;
       function Editar : Boolean;
@@ -54,6 +58,11 @@ begin
   inherited;
 end;
 
+function TItem.getAtivo: Boolean;
+begin
+  result := Fativo;
+end;
+
 function TItem.getCodigo: Integer;
 begin
   result := Fcodigo;
@@ -67,6 +76,11 @@ end;
 function TItem.getValor: Double;
 begin
   result := Fvalor;
+end;
+
+procedure TItem.setAtivo(const Value: Boolean);
+begin
+  Fativo := Value;
 end;
 
 procedure TItem.setCodigo(const Value: Integer);
@@ -97,10 +111,11 @@ begin
     try
       quInserir.Close;
       quInserir.SQL.Clear;
-      quInserir.SQL.Add('INSERT INTO ' + tabelaItem + '( DESCRICAO,  VALOR)');
-      quInserir.SQL.Add('VALUES                        (:DESCRICAO, :VALOR)');
+      quInserir.SQL.Add('INSERT INTO ' + tabelaItem + '( DESCRICAO,  VALOR,  ATIVO)');
+      quInserir.SQL.Add('VALUES                        (:DESCRICAO, :VALOR, :ATIVO)');
       quInserir.Params.ParamByName('DESCRICAO').AsString := descricao;
       quInserir.Params.ParamByName('VALOR').AsFloat := valor;
+      quInserir.Params.ParamByName('ATIVO').AsBoolean := ativo;
       quInserir.ExecSQL;
 
       if quInserir.RowsAffected < 1 then
@@ -132,10 +147,12 @@ begin
       quEditar.SQL.Clear;
       quEditar.SQL.Add('UPDATE ' + tabelaItem);
       quEditar.SQL.Add('SET    DESCRICAO = :DESCRICAO,');
-      quEditar.SQL.Add('       VALOR = :VALOR');
+      quEditar.SQL.Add('       VALOR = :VALOR,');
+      quEditar.SQL.Add('       ATIVO = :ATIVO');
       quEditar.SQL.Add('WHERE  CODIGO = :CODIGO');
       quEditar.Params.ParamByName('DESCRICAO').AsString := descricao;
       quEditar.Params.ParamByName('VALOR').AsFloat := valor;
+      quEditar.Params.ParamByName('ATIVO').AsBoolean := ativo;
       quEditar.Params.ParamByName('CODIGO').AsInteger := codigo;
       quEditar.ExecSQL;
 
@@ -196,7 +213,7 @@ begin
     try
       quInformacoesItem.Close;
       quInformacoesItem.SQL.Clear;
-      quInformacoesItem.SQL.Add('SELECT DESCRICAO, VALOR');
+      quInformacoesItem.SQL.Add('SELECT DESCRICAO, VALOR, ATIVO');
       quInformacoesItem.SQL.Add('FROM   ITENS');
       quInformacoesItem.SQL.Add('WHERE  CODIGO = :CODIGO');
       quInformacoesItem.Params.ParamByName('CODIGO').AsInteger := codigo;
@@ -207,6 +224,7 @@ begin
 
       descricao := quInformacoesItem.FieldByName('DESCRICAO').AsString;
       valor := quInformacoesItem.FieldByName('VALOR').AsFloat;
+      ativo := quInformacoesItem.FieldByName('ATIVO').AsBoolean;
     except
       on e:Exception do
         raise Exception.Create(e.Message);
@@ -222,9 +240,9 @@ begin
   try
     quCarregaItens.Close;
     quCarregaItens.SQL.Clear;
-    quCarregaItens.SQL.Add('SELECT SUBSTR(''0000''||CODIGO, -4) AS CODIGO, DESCRICAO, VALOR');
+    quCarregaItens.SQL.Add('SELECT SUBSTR(''0000''||CODIGO, -4) AS CODIGO, DESCRICAO, VALOR, ATIVO');
     quCarregaItens.SQL.Add('FROM   ITENS');
-    //quCarregaItens.SQL.Add('WHERE  ATIVO = TRUE');
+    quCarregaItens.SQL.Add('WHERE  ATIVO = TRUE');
     quCarregaItens.SQL.Add('ORDER  BY CODIGO DESC');
     quCarregaItens.Open;
   except

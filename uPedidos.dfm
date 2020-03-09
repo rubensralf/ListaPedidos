@@ -219,6 +219,7 @@
         Width = 100
         Height = 21
         Alignment = taRightJustify
+        MaxLength = 10
         TabOrder = 2
         Text = '0,00'
         OnExit = edtValorDescontoExit
@@ -473,6 +474,7 @@
           Width = 60
           Height = 21
           Alignment = taRightJustify
+          MaxLength = 8
           TabOrder = 0
         end
         object cbbFiltroSituacao: TComboBox
@@ -842,7 +844,6 @@
     end
   end
   object quPedidos: TFDQuery
-    Connection = con1
     SQL.Strings = (
       
         'select ped.numero, ped.data, ped.descricao, ped.situacao, ped.va' +
@@ -894,7 +895,6 @@
     Top = 272
   end
   object quItensPedido: TFDQuery
-    Connection = con1
     SQL.Strings = (
       
         'select itped.numeropedido, itped.codigoitem, itped.quantidade, i' +
@@ -946,14 +946,5 @@
     DataSet = quItensPedido
     Left = 232
     Top = 672
-  end
-  object con1: TFDConnection
-    Params.Strings = (
-      'Database=D:\Git\ListaPedidos\pedidos.db'
-      'DriverID=SQLite')
-    Connected = True
-    LoginPrompt = False
-    Left = 432
-    Top = 339
   end
 end

@@ -79,7 +79,6 @@ type
     mmoDescricaoPedido: TMemo;
     sbtConfirmarPedido: TPngSpeedButton;
     sbtConfirmarItemPedido: TPngSpeedButton;
-    con1: TFDConnection;
     quPedidossituacao_fmt: TStringField;
     quItensPedidonumeroPedido: TIntegerField;
     quItensPedidocodigoItem: TIntegerField;
@@ -563,7 +562,7 @@ end;
 
 procedure TfPedidos.sbtExcluirItemClick(Sender: TObject);
 begin
-   if quItensPedido.FieldByName('NUMEROPEDIDO').AsInteger <= 0 then
+  if quItensPedido.FieldByName('NUMEROPEDIDO').AsInteger <= 0 then
   begin
     ShowMessage('Um item deve ser selecionado para exclusão.');
     Exit;
