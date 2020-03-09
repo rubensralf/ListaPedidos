@@ -75,6 +75,7 @@ begin
     fPedidos := TfPedidos.Create(Self);
     fPedidos.AtribuiConexao(Fconexao);
     fPedidos.CarregarPedidos;
+    fPedidos.CarregarSituacoes;
     fPedidos.Show;
   except
     on e:Exception do

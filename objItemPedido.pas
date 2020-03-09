@@ -41,6 +41,7 @@ type
       function Excluir : Boolean;
       function ExcluirItensPorPedido : Boolean;
       function PossuiItens : Boolean;
+      function RetornaValorTotalSomado : Double;
 
       procedure CarregarItensPedido(var quItensPedido : TFDQuery);
 
@@ -148,7 +149,7 @@ begin
       quInserir.SQL.Clear;
       quInserir.SQL.Add('INSERT INTO ' + tabelaItensPedido + '( NUMEROPEDIDO,  CODIGOITEM,  QUANTIDADE,  DESCONTO,  VALORTOTAL)');
       quInserir.SQL.Add('VALUES                               (:NUMEROPEDIDO, :CODIGOITEM, :QUANTIDADE, :DESCONTO, :VALORTOTAL)');
-      quInserir.Params.ParamByName('NUMEROPEDIDO').AsDate := numeroPedido;
+      quInserir.Params.ParamByName('NUMEROPEDIDO').AsInteger := numeroPedido;
       quInserir.Params.ParamByName('CODIGOITEM').AsInteger := codigoItem;
       quInserir.Params.ParamByName('QUANTIDADE').AsInteger := quantidade;
       quInserir.Params.ParamByName('DESCONTO').AsFloat := desconto;
@@ -303,6 +304,37 @@ begin
   finally
     quItensPedido.Close;
     FreeAndNil(quItensPedido);
+  end;
+end;
+
+function TItemPedido.RetornaValorTotalSomado: Double;
+var
+  quSomarValorTotal : TFDQuery;
+begin
+  try
+    result := 0;
+
+    quSomarValorTotal := TFDQuery.Create(nil);
+    quSomarValorTotal.Connection := Fconexao;
+
+    try
+      quSomarValorTotal.Close;
+      quSomarValorTotal.SQL.Clear;
+      quSomarValorTotal.SQL.Add('SELECT SUM(VALORTOTAL) VALORTOTAL');
+      quSomarValorTotal.SQL.Add('FROM   ITENSPEDIDO');
+      quSomarValorTotal.SQL.Add('WHERE  NUMEROPEDIDO = :NUMEROPEDIDO');
+      quSomarValorTotal.Params.ParamByName('NUMEROPEDIDO').AsInteger := numeroPedido;
+      quSomarValorTotal.Open;
+
+      if not quSomarValorTotal.Eof then
+        result := quSomarValorTotal.FieldByName('VALORTOTAL').AsFloat;
+    except
+      on e:Exception do
+        raise Exception.Create(e.Message);
+    end;
+  finally
+    quSomarValorTotal.Close;
+    FreeAndNil(quSomarValorTotal);
   end;
 end;
 

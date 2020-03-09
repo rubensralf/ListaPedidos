@@ -23,14 +23,16 @@ type
       procedure setDescricao(const Value: String);
       procedure setValor(const Value: Double);
 
-      function Salvar : Boolean;
-      function Editar : Boolean;
-      function Excluir : Boolean;
-
     public
       property codigo : Integer read getCodigo write setCodigo;
       property descricao : String read getDescricao write setDescricao;
       property valor : Double read getValor write setValor;
+
+      function Salvar : Boolean;
+      function Editar : Boolean;
+      function Excluir : Boolean;
+      procedure BuscarInformacoesItem;
+      procedure CarregarItens(var quCarregaItens : TFDQuery);
 
       constructor Create(objConexao : TFDConnection);
       destructor Destroy;
@@ -180,6 +182,54 @@ begin
   finally
     quExcluir.Close;
     FreeAndNil(quExcluir);
+  end;
+end;
+
+procedure TItem.BuscarInformacoesItem;
+var
+  quInformacoesItem : TFDQuery;
+begin
+  try
+    quInformacoesItem := TFDQuery.Create(nil);
+    quInformacoesItem.Connection := Fconexao;
+
+    try
+      quInformacoesItem.Close;
+      quInformacoesItem.SQL.Clear;
+      quInformacoesItem.SQL.Add('SELECT DESCRICAO, VALOR');
+      quInformacoesItem.SQL.Add('FROM   ITENS');
+      quInformacoesItem.SQL.Add('WHERE  CODIGO = :CODIGO');
+      quInformacoesItem.Params.ParamByName('CODIGO').AsInteger := codigo;
+      quInformacoesItem.Open;
+
+      if quInformacoesItem.Eof then
+        raise Exception.Create('Informações não encontradas para o item ' + IntToStr(codigo));
+
+      descricao := quInformacoesItem.FieldByName('DESCRICAO').AsString;
+      valor := quInformacoesItem.FieldByName('VALOR').AsFloat;
+    except
+      on e:Exception do
+        raise Exception.Create(e.Message);
+    end;
+  finally
+    quInformacoesItem.Close;
+    FreeAndNil(quInformacoesItem);
+  end;
+end;
+
+procedure TItem.CarregarItens(var quCarregaItens : TFDQuery);
+begin
+  try
+    quCarregaItens.Close;
+    quCarregaItens.SQL.Clear;
+    quCarregaItens.SQL.Add('SELECT SUBSTR(''0000''||CODIGO, -4) AS CODIGO, DESCRICAO, VALOR');
+    quCarregaItens.SQL.Add('FROM   ITENS');
+    //quCarregaItens.SQL.Add('WHERE  ATIVO = TRUE');
+    quCarregaItens.SQL.Add('ORDER  BY CODIGO DESC');
+    quCarregaItens.Open;
+  except
+    on e:Exception do
+      raise Exception.Create(e.Message);
   end;
 end;
 

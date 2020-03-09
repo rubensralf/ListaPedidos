@@ -8,10 +8,10 @@ uses
   Vcl.ExtCtrls, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  Vcl.StdCtrls, Vcl.Buttons, PngSpeedButton, Vcl.ComCtrls, Vcl.Mask, objPedido, objItemPedido,
+  Vcl.StdCtrls, Vcl.Buttons, PngSpeedButton, Vcl.ComCtrls, Vcl.Mask,
   FireDAC.UI.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Phys,
   FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef, FireDAC.Stan.ExprFuncs,
-  FireDAC.VCLUI.Wait;
+  FireDAC.VCLUI.Wait, objPedido, objItemPedido, objItem, objSituacao;
 
 type
   TfPedidos = class(TForm)
@@ -31,7 +31,6 @@ type
     lblVlrDesconto: TLabel;
     cbbItem: TComboBox;
     edtQuantidade: TEdit;
-    medValor: TMaskEdit;
     dbgItensPedido: TDBGrid;
     pnlPedidos: TPanel;
     dbgPedidos: TDBGrid;
@@ -86,6 +85,7 @@ type
     quItensPedidocodigoItem: TIntegerField;
     quItensPedidodescricao: TStringField;
     quItensPedidovaloritem: TFloatField;
+    edtValorDesconto: TEdit;
     procedure sbtExcluirPedidoClick(Sender: TObject);
     procedure sbtSairClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -100,22 +100,32 @@ type
     procedure sbtCancelarEdicaoItemClick(Sender: TObject);
     procedure sbtExcluirItemClick(Sender: TObject);
     procedure sbtNovoItemClick(Sender: TObject);
+    procedure sbtConfirmarItemPedidoClick(Sender: TObject);
+    procedure cbbItemDropDown(Sender: TObject);
+    procedure edtValorDescontoKeyPress(Sender: TObject; var Key: Char);
+    procedure edtValorDescontoExit(Sender: TObject);
 
   private
     { Private declarations }
     Fconexao : TFDConnection;
     Fpedido : TPedido;
     FitemPedido : TItemPedido;
+    Fitem : TItem;
+    Fsituacao : TSituacao;
     novoPedido : Boolean;
     alterarPedido : Boolean;
+    novoItem : Boolean;
+    alterarItem : Boolean;
 
     procedure CarregarItensPedido;
+    procedure CarregarItens;
 
   public
     { Public declarations }
 
     procedure AtribuiConexao(objConexao : TFDConnection);
     procedure CarregarPedidos;
+    procedure CarregarSituacoes;
 
   end;
 
@@ -143,6 +153,8 @@ begin
 
     Fpedido := TPedido.Create(Fconexao);
     FitemPedido := TItemPedido.Create(Fconexao);
+    Fitem := TItem.Create(Fconexao);
+    Fsituacao := TSituacao.Create(Fconexao);
   except
     on e:Exception do
       ShowMessage('Erro ao iniciar conexão.' + #13 + 'Erro: ' + e.Message);
@@ -159,6 +171,40 @@ begin
   CarregarPedidos;
 end;
 
+procedure TfPedidos.CarregarItens;
+var
+  quCarregaItens : TFDQuery;
+begin
+  try
+    quCarregaItens := TFDQuery.Create(Self);
+    quCarregaItens.Connection := Fconexao;
+
+    try
+      quCarregaItens.Close;
+      quCarregaItens.SQL.Clear;
+
+      Fitem.CarregarItens(quCarregaItens);
+
+      cbbItem.Items.Clear;
+
+      while not quCarregaItens.Eof do
+      begin
+        cbbItem.Items.Add(quCarregaItens.FieldByName('CODIGO').AsString + ' - R$' +
+                          quCarregaItens.FieldByName('VALOR').AsString + ' - ' +
+                          quCarregaItens.FieldByName('DESCRICAO').AsString);
+
+        quCarregaItens.Next;
+      end;
+    except
+      on e:Exception do
+        ShowMessage('Erro ao carregar itens!' + #13 + 'Erro: ' + e.Message);
+    end;
+  finally
+    quCarregaItens.Close;
+    FreeAndNil(quCarregaItens);
+  end;
+end;
+
 procedure TfPedidos.CarregarItensPedido;
 begin
   try    
@@ -168,7 +214,7 @@ begin
     FitemPedido.numeroPedido := Fpedido.numero;
     FitemPedido.CarregarItensPedido(quItensPedido);
 
-    quPedidos.Open;
+    quItensPedido.Open;
   except
     on e:Exception do
       ShowMessage('Erro ao carregar pedidos!' + #13 + 'Erro: ' + e.Message);
@@ -186,7 +232,11 @@ begin
     else
       Fpedido.numero := 0;
 
-    Fpedido.situacao := cbbFiltroSituacao.ItemIndex;
+    if cbbFiltroSituacao.ItemIndex >= 0 then
+      Fpedido.situacao := StrToInt(Copy(cbbFiltroSituacao.Text, 1, 2))
+    else
+      Fpedido.situacao := 0;
+
     Fpedido.CarregarPedidos(quPedidos, dtpFiltroDataDe.Date, dtpFiltroDataAte.Date);
 
     quPedidos.Open;
@@ -194,6 +244,47 @@ begin
     on e:Exception do
       ShowMessage('Erro ao carregar pedidos!' + #13 + 'Erro: ' + e.Message);
   end;
+end;
+
+procedure TfPedidos.CarregarSituacoes;
+var
+  quSituacoes : TFDQuery;
+begin
+  try
+    quSituacoes := TFDQuery.Create(Self);
+    quSituacoes.Connection := Fconexao;
+
+    try
+      quSituacoes.Close;
+      quSituacoes.SQL.Clear;
+
+      Fsituacao.BuscaSituacoes(quSituacoes);
+
+      cbbFiltroSituacao.Items.Clear;
+      cbbFiltroSituacao.Items.Add('00 - Todos');
+
+      while not quSituacoes.Eof do
+      begin
+        cbbFiltroSituacao.Items.Add(quSituacoes.FieldByName('CODIGO').AsString + ' - ' +
+                                    quSituacoes.FieldByName('DESCRICAO').AsString);
+
+        quSituacoes.Next;
+      end;
+
+      cbbFiltroSituacao.ItemIndex := 0;
+    except
+      on e:Exception do
+        ShowMessage('Erro ao carregar situações!' + #13 + 'Erro: ' + e.Message);
+    end;
+  finally
+    quSituacoes.Close;
+    FreeAndNil(quSituacoes);
+  end;
+end;
+
+procedure TfPedidos.cbbItemDropDown(Sender: TObject);
+begin
+  CarregarItens;
 end;
 
 procedure TfPedidos.dbgPedidosCellClick(Column: TColumn);
@@ -220,10 +311,42 @@ begin
   end;
 end;
 
+procedure TfPedidos.edtValorDescontoExit(Sender: TObject);
+begin
+  try
+    if Trim(edtValorDesconto.Text) <> '' then
+    begin
+      if StrToFloat(edtValorDesconto.Text) > 0 then
+      begin
+        edtValorDesconto.Text := FormatFloat('##,###,###.##', StrToFloat(edtValorDesconto.Text));
+      end;
+    end;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao formatar valor!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
+procedure TfPedidos.edtValorDescontoKeyPress(Sender: TObject; var Key: Char);
+begin
+  try
+    if not (Key in ['0'..'9', Chr(44), Chr(127), Chr(8)]) then
+      Key := #0;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao aplicar regra!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
 procedure TfPedidos.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Fconexao.Connected := False;
+
   Fpedido.Destroy;
+  FitemPedido.Destroy;
+  Fitem.Destroy;
+  Fsituacao.Destroy;
+
   Action := caFree;
   fPedidos := nil;
 end;
@@ -233,6 +356,8 @@ begin
   try
     novoPedido := False;
     alterarPedido := False;
+    novoItem := False;
+    alterarItem := False;
 
     dtpData.Date := Now;
     dtpFiltroDataDe.Date := StrToDate('01/' + FormatDateTime('mm/yyyy', Date));
@@ -254,6 +379,8 @@ begin
     sbtCancelarEdicaoItem.Enabled := False;
     pnlDadosItens.Enabled := False;
     sbtConfirmarItemPedido.Enabled := False;
+    novoItem := False;
+    alterarItem := False;
   except
     on e:Exception do
       ShowMessage('Erro ao cancelar edição de itens!' + #13 + 'Erro: ' + e.Message);
@@ -280,39 +407,118 @@ begin
   end;
 end;
 
+procedure TfPedidos.sbtConfirmarItemPedidoClick(Sender: TObject);
+begin
+  try
+    Fconexao.StartTransaction;
+
+    try
+      if cbbItem.ItemIndex < 0 then
+      begin
+        ShowMessage('Um item deve ser selecionado!');
+        cbbItem.SetFocus;
+        Exit;
+      end;
+
+      if Trim(edtQuantidade.Text) = '' then
+      begin
+        ShowMessage('Uma quantidade deve ser informada!');
+        Exit;
+      end;
+
+      if StrToInt(edtQuantidade.Text) <= 0  then
+      begin
+        ShowMessage('A quantidade deve ser maior que zero!');
+        Exit;
+      end;
+
+      FitemPedido.numeroPedido := Fpedido.numero;
+      FitemPedido.codigoItem := StrToInt(Copy(cbbItem.Text, 1, 4));
+      FitemPedido.quantidade := StrToInt(edtQuantidade.Text);
+      FitemPedido.desconto := StrToFloat(edtValorDesconto.Text);
+
+      Fitem.codigo := FitemPedido.codigoItem;
+      Fitem.BuscarInformacoesItem;
+
+      FitemPedido.valorTotal := (Fitem.valor * FitemPedido.quantidade) - FitemPedido.desconto;
+
+      if novoItem then
+        FitemPedido.Salvar
+      else
+        if alterarItem then
+          FitemPedido.Editar
+        else
+          raise Exception.Create('Nenhuma operação de item selecionada!');
+
+      Fconexao.Commit;
+
+      quItensPedido.Close;
+      quItensPedido.Open;
+
+      sbtCancelarEdicaoItemClick(Self);
+
+      Fpedido.valorTotal := FitemPedido.RetornaValorTotalSomado;
+      Fpedido.AtualizarValorTotal;
+
+      dbgPedidosCellClick(nil);
+    except
+      on e:Exception do
+      begin
+        Fconexao.Rollback;
+        ShowMessage('Erro ao salvar item do pedido.' + #13 + 'Erro: ' + e.Message);
+      end;
+    end;
+  finally
+    if Fconexao.InTransaction then
+      Fconexao.Rollback;
+  end;
+end;
+
 procedure TfPedidos.sbtConfirmarPedidoClick(Sender: TObject);
 begin
   try
-    if Trim(mmoDescricaoPedido.Lines.Text) = '' then
-    begin
-      ShowMessage('Uma descrição deve ser informada!');
-      mmoDescricaoPedido.SetFocus;
-      Exit;
-    end;
+    Fconexao.StartTransaction;
 
-    Fpedido.data := dtpData.Date;
-    Fpedido.descricao := mmoDescricaoPedido.Lines.Text;
-
-    if novoPedido then
-    begin
-      Fpedido.situacao := 1; // 1 = Em análise
-      Fpedido.Salvar;
-    end
-    else
-      if alterarPedido then
+    try
+      if Trim(mmoDescricaoPedido.Lines.Text) = '' then
       begin
-        Fpedido.numero := quPedidos.FieldByName('NUMERO').AsInteger;
-        Fpedido.Editar;
+        ShowMessage('Uma descrição deve ser informada!');
+        mmoDescricaoPedido.SetFocus;
+        Exit;
+      end;
+
+      Fpedido.data := dtpData.Date;
+      Fpedido.descricao := mmoDescricaoPedido.Lines.Text;
+
+      if novoPedido then
+      begin
+        Fpedido.situacao := 1; // 1 = Em análise
+        Fpedido.Salvar;
       end
       else
-        raise Exception.Create('Nenhuma operação selecionada!');
+        if alterarPedido then
+        begin
+          Fpedido.numero := quPedidos.FieldByName('NUMERO').AsInteger;
+          Fpedido.Editar;
+        end
+        else
+          raise Exception.Create('Nenhuma operação de pedido selecionada!');
 
-    quPedidos.Refresh;
+      quPedidos.Refresh;
 
-    sbtCancelarEdicaoPedidoClick(Self);
-  except
-    on e:Exception do
-      ShowMessage('Erro ao salvar pedido.' + #13 + 'Erro: ' + e.Message);
+      sbtCancelarEdicaoPedidoClick(Self);
+
+      Fconexao.Commit;
+    except
+      on e:Exception do
+      begin
+        Fconexao.Rollback;
+        ShowMessage('Erro ao salvar pedido.' + #13 + 'Erro: ' + e.Message);
+      end;
+    end;
+  finally
+    if Fconexao.InTransaction then
+      Fconexao.Rollback;
   end;
 end;
 
@@ -327,6 +533,7 @@ begin
     sbtCancelarEdicaoItem.Enabled := True;
     pnlDadosItens.Enabled := True;
     sbtConfirmarItemPedido.Enabled := True;
+    alterarItem := True;
     cbbItem.SetFocus;
   except
     on e:Exception do
@@ -446,6 +653,7 @@ begin
     sbtCancelarEdicaoItem.Enabled := True;
     pnlDadosItens.Enabled := True;
     sbtConfirmarItemPedido.Enabled := True;
+    novoItem := True;
     cbbItem.SetFocus;
   except
     on e:Exception do

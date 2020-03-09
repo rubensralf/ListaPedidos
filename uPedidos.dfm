@@ -55,7 +55,6 @@
       ParentBackground = False
       ParentFont = False
       TabOrder = 0
-      ExplicitTop = 5
       object pnl6: TPanel
         Left = 762
         Top = 0
@@ -148,6 +147,7 @@
           Height = 22
           Enabled = False
           Flat = True
+          OnClick = sbtConfirmarItemPedidoClick
           PngImage.Data = {
             89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
             610000000473424954080808087C086488000000097048597300000B1300000B
@@ -171,7 +171,6 @@
       Enabled = False
       ParentBackground = False
       TabOrder = 1
-      ExplicitTop = 30
       object lblItem: TLabel
         Left = 47
         Top = 15
@@ -201,6 +200,7 @@
         Ctl3D = False
         ParentCtl3D = False
         TabOrder = 0
+        OnDropDown = cbbItemDropDown
       end
       object edtQuantidade: TEdit
         Left = 72
@@ -213,16 +213,16 @@
         ParentCtl3D = False
         TabOrder = 1
       end
-      object medValor: TMaskEdit
+      object edtValorDesconto: TEdit
         Left = 199
         Top = 36
         Width = 100
         Height = 21
         Alignment = taRightJustify
-        EditMask = '00.000.000,00;1;_'
-        MaxLength = 13
         TabOrder = 2
-        Text = '  .   .   ,  '
+        Text = '0,00'
+        OnExit = edtValorDescontoExit
+        OnKeyPress = edtValorDescontoKeyPress
       end
     end
     object dbgItensPedido: TDBGrid
@@ -366,7 +366,6 @@
           Expanded = False
           FieldName = 'situacao'
           Title.Caption = 'Situa'#231#227'o'
-          Width = -1
           Visible = False
         end>
     end
@@ -486,15 +485,8 @@
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
-          ItemIndex = 0
           ParentFont = False
           TabOrder = 1
-          Text = '00 - Todos'
-          Items.Strings = (
-            '00 - Todos'
-            '01 - Em an'#225'lise'
-            '02 - Aprovado'
-            '03 - Cancelado')
         end
         object dtpFiltroDataDe: TDateTimePicker
           Left = 159
@@ -961,7 +953,7 @@
       'DriverID=SQLite')
     Connected = True
     LoginPrompt = False
-    Left = 504
-    Top = 419
+    Left = 432
+    Top = 339
   end
 end

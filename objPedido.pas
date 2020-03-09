@@ -41,7 +41,7 @@ type
       function Editar : Boolean;
       function Excluir : Boolean;
       function AlterarSituacao(novaSituacao : Integer) : Boolean;
-      function AtualizarValorTotal(novoValorTotal : Double) : Boolean;
+      function AtualizarValorTotal : Boolean;
       procedure CarregarPedidos(var quPedidos : TFDQuery; dataInicial, dataFinal : TDate);
 
       constructor Create(objConexao : TFDConnection);
@@ -286,7 +286,7 @@ begin
   end;
 end;
 
-function TPedido.AtualizarValorTotal(novoValorTotal: Double): Boolean;
+function TPedido.AtualizarValorTotal : Boolean;
 var
   quAtualizarValor : TFDQuery;
 begin
@@ -302,7 +302,7 @@ begin
       quAtualizarValor.SQL.Add('UPDATE ' + tabelaPedidos);
       quAtualizarValor.SQL.Add('SET    VALORTOTAL = :VALORTOTAL');
       quAtualizarValor.SQL.Add('WHERE  NUMERO = :NUMERO');
-      quAtualizarValor.Params.ParamByName('VALORTOTAL').AsFloat := novoValorTotal;
+      quAtualizarValor.Params.ParamByName('VALORTOTAL').AsFloat := valorTotal;
       quAtualizarValor.Params.ParamByName('NUMERO').AsInteger := numero;
       quAtualizarValor.ExecSQL;
 

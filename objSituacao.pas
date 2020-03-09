@@ -68,7 +68,7 @@ begin
   try
     quSituacoes.Close;
     quSituacoes.SQL.Clear;
-    quSituacoes.SQL.Add('SELECT CODIGO, DESCRICAO');
+    quSituacoes.SQL.Add('SELECT SUBSTR(''00''||CODIGO, -2) AS CODIGO, DESCRICAO');
     quSituacoes.SQL.Add('FROM   SITUACOES');
     quSituacoes.SQL.Add('ORDER  BY CODIGO');
     quSituacoes.Open;
