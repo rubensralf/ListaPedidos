@@ -62,6 +62,7 @@ procedure TfPrincipal.mniItensClick(Sender: TObject);
 begin
   try
     fItens := TfItens.Create(Self);
+    fItens.AtribuiConexao(Fconexao);
     fItens.Show;
   except
     on e:Exception do
@@ -76,6 +77,7 @@ begin
     fPedidos.AtribuiConexao(Fconexao);
     fPedidos.CarregarPedidos;
     fPedidos.CarregarSituacoes;
+    fPedidos.CarregarItensComboBox;
     fPedidos.Show;
   except
     on e:Exception do

@@ -14,8 +14,6 @@ type
       Fativo : Boolean;
       Fconexao : TFDConnection;
 
-      const tabelaItem : String = 'ITENS';
-
     protected
       function getCodigo : Integer;
       function getDescricao : String;
@@ -111,8 +109,8 @@ begin
     try
       quInserir.Close;
       quInserir.SQL.Clear;
-      quInserir.SQL.Add('INSERT INTO ' + tabelaItem + '( DESCRICAO,  VALOR,  ATIVO)');
-      quInserir.SQL.Add('VALUES                        (:DESCRICAO, :VALOR, :ATIVO)');
+      quInserir.SQL.Add('INSERT INTO ITENS ( DESCRICAO,  VALOR,  ATIVO)');
+      quInserir.SQL.Add('VALUES            (:DESCRICAO, :VALOR, :ATIVO)');
       quInserir.Params.ParamByName('DESCRICAO').AsString := descricao;
       quInserir.Params.ParamByName('VALOR').AsFloat := valor;
       quInserir.Params.ParamByName('ATIVO').AsBoolean := ativo;
@@ -145,7 +143,7 @@ begin
     try
       quEditar.Close;
       quEditar.SQL.Clear;
-      quEditar.SQL.Add('UPDATE ' + tabelaItem);
+      quEditar.SQL.Add('UPDATE ITENS');
       quEditar.SQL.Add('SET    DESCRICAO = :DESCRICAO,');
       quEditar.SQL.Add('       VALOR = :VALOR,');
       quEditar.SQL.Add('       ATIVO = :ATIVO');
@@ -183,7 +181,7 @@ begin
     try
       quExcluir.Close;
       quExcluir.SQL.Clear;
-      quExcluir.SQL.Add('DELETE FROM ' + tabelaItem);
+      quExcluir.SQL.Add('DELETE FROM ITENS');
       quExcluir.SQL.Add('WHERE  CODIGO = :CODIGO');
       quExcluir.Params.ParamByName('CODIGO').AsInteger := codigo;
       quExcluir.ExecSQL;
@@ -240,7 +238,7 @@ begin
   try
     quCarregaItens.Close;
     quCarregaItens.SQL.Clear;
-    quCarregaItens.SQL.Add('SELECT SUBSTR(''0000''||CODIGO, -4) AS CODIGO, DESCRICAO, VALOR, ATIVO');
+    quCarregaItens.SQL.Add('SELECT CODIGO, DESCRICAO, VALOR, ATIVO');
     quCarregaItens.SQL.Add('FROM   ITENS');
     quCarregaItens.SQL.Add('WHERE  ATIVO = TRUE');
     quCarregaItens.SQL.Add('ORDER  BY CODIGO DESC');

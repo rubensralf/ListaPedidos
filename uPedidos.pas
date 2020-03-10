@@ -100,9 +100,10 @@ type
     procedure sbtExcluirItemClick(Sender: TObject);
     procedure sbtNovoItemClick(Sender: TObject);
     procedure sbtConfirmarItemPedidoClick(Sender: TObject);
-    procedure cbbItemDropDown(Sender: TObject);
     procedure edtValorDescontoKeyPress(Sender: TObject; var Key: Char);
     procedure edtValorDescontoExit(Sender: TObject);
+    procedure dbgItensPedidoCellClick(Column: TColumn);
+    procedure edtValorDescontoEnter(Sender: TObject);
 
   private
     { Private declarations }
@@ -117,7 +118,9 @@ type
     alterarItem : Boolean;
 
     procedure CarregarItensPedido;
-    procedure CarregarItens;
+    procedure LimpaCamposPedido;
+    procedure LimpaCamposItensPedido;
+    procedure CarregarTotalizadores;
 
   public
     { Public declarations }
@@ -125,6 +128,7 @@ type
     procedure AtribuiConexao(objConexao : TFDConnection);
     procedure CarregarPedidos;
     procedure CarregarSituacoes;
+    procedure CarregarItensComboBox;
 
   end;
 
@@ -170,7 +174,7 @@ begin
   CarregarPedidos;
 end;
 
-procedure TfPedidos.CarregarItens;
+procedure TfPedidos.CarregarItensComboBox;
 var
   quCarregaItens : TFDQuery;
 begin
@@ -188,9 +192,10 @@ begin
 
       while not quCarregaItens.Eof do
       begin
-        cbbItem.Items.Add(quCarregaItens.FieldByName('CODIGO').AsString + ' - R$' +
-                          quCarregaItens.FieldByName('VALOR').AsString + ' - ' +
-                          quCarregaItens.FieldByName('DESCRICAO').AsString);
+        cbbItem.Items.AddObject(Trim(FormatFloat('00000000', quCarregaItens.FieldByName('CODIGO').AsInteger)) + ' - R$' +
+                                Trim(FormatFloat('##,###,##0.00', quCarregaItens.FieldByName('VALOR').AsFloat)) + ' - ' +
+                                Trim(quCarregaItens.FieldByName('DESCRICAO').AsString),
+                                TObject(Integer(quCarregaItens.FieldByName('CODIGO').AsInteger)));
 
         quCarregaItens.Next;
       end;
@@ -281,9 +286,49 @@ begin
   end;
 end;
 
-procedure TfPedidos.cbbItemDropDown(Sender: TObject);
+procedure TfPedidos.CarregarTotalizadores;
+var
+  valorBruto : Double;
+  valorDesconto : Double;
+  valorLiquido : Double;
 begin
-  CarregarItens;
+  try
+    valorBruto := FitemPedido.RetornaValorBruto;
+    valorDesconto := FitemPedido.RetornaValorDesconto;
+    valorLiquido := FitemPedido.RetornaValorLiquido;
+
+    pnlValorBruto.Caption := 'R$' + FormatFloat('##,###,##0.00', valorBruto);
+    pnlValorDesconto.Caption := 'R$' + FormatFloat('##,###,##0.00', valorDesconto);
+    pnlValorLiquido.Caption := 'R$' + FormatFloat('##,###,##0.00', valorLiquido);
+  except
+    on e:Exception do
+      ShowMessage('Erro ao carregar valores totais!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
+procedure TfPedidos.dbgItensPedidoCellClick(Column: TColumn);
+begin
+  try
+    if not quItensPedido.Eof then
+    begin
+      FitemPedido.numeroPedido := quItensPedido.FieldByName('NUMEROPEDIDO').AsInteger;
+      FitemPedido.codigoItem := quItensPedido.FieldByName('CODIGOITEM').AsInteger;
+      FitemPedido.quantidade := quItensPedido.FieldByName('QUANTIDADE').AsInteger;
+      FitemPedido.desconto := quItensPedido.FieldByName('DESCONTO').AsFloat;
+      FitemPedido.valorTotal := quItensPedido.FieldByName('VALORTOTAL').AsFloat;
+
+      Fitem.codigo := FitemPedido.codigoItem;
+      Fitem.BuscarInformacoesItem;
+
+      cbbItem.ItemIndex := cbbItem.Items.IndexOfObject(TObject(Integer(FitemPedido.codigoItem)));
+      edtQuantidade.Text := IntToStr(FitemPedido.quantidade);
+      edtValorDesconto.Text := FloatToStr(FitemPedido.desconto);
+      edtValorDescontoExit(Self);
+    end;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao carregar informações do item!' + #13 + 'Erro: ' + e.Message);
+  end;
 end;
 
 procedure TfPedidos.dbgPedidosCellClick(Column: TColumn);
@@ -303,6 +348,9 @@ begin
 
       pnlFundoItens.Enabled := True;
       CarregarItensPedido;
+
+      FitemPedido.numeroPedido := Fpedido.numero;
+      CarregarTotalizadores;
     end;
   except
     on e:Exception do
@@ -310,12 +358,17 @@ begin
   end;
 end;
 
+procedure TfPedidos.edtValorDescontoEnter(Sender: TObject);
+begin
+  edtValorDesconto.Text := StringReplace(edtValorDesconto.Text, '.', '', [rfReplaceAll]);
+end;
+
 procedure TfPedidos.edtValorDescontoExit(Sender: TObject);
 begin
   try
     if Trim(edtValorDesconto.Text) <> '' then
     begin
-      if StrToFloat(edtValorDesconto.Text) > 0 then
+      if StrToFloat(StringReplace(edtValorDesconto.Text, '.', '', [rfReplaceAll])) > 0 then
       begin
         edtValorDesconto.Text := FormatFloat('##,###,###.##', StrToFloat(edtValorDesconto.Text));
       end;
@@ -364,6 +417,29 @@ begin
   except
     on e:Exception do
       ShowMessage('Erro ao iniciar sistema!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
+procedure TfPedidos.LimpaCamposItensPedido;
+begin
+  try
+    cbbItem.ItemIndex := -1;
+    edtQuantidade.Text := '0';
+    edtValorDesconto.Text := '0,00';
+  except
+    on e:Exception do
+      ShowMessage('Erro ao limpar campos dos itens do pedido!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
+procedure TfPedidos.LimpaCamposPedido;
+begin
+  try
+    dtpData.Date := Now;
+    mmoDescricaoPedido.Lines.Clear;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao limpar campos do pedido!' + #13 + 'Erro: ' + e.Message);
   end;
 end;
 
@@ -422,19 +498,28 @@ begin
       if Trim(edtQuantidade.Text) = '' then
       begin
         ShowMessage('Uma quantidade deve ser informada!');
+        edtQuantidade.SetFocus;
         Exit;
       end;
 
-      if StrToInt(edtQuantidade.Text) <= 0  then
+      if StrToFloat(StringReplace(edtValorDesconto.Text, '.', '', [rfReplaceAll])) > 99999999.99  then
       begin
-        ShowMessage('A quantidade deve ser maior que zero!');
+        ShowMessage('O valor deve ser menor que R$99.999.999,99!');
+        edtValorDesconto.SetFocus;
         Exit;
       end;
 
       FitemPedido.numeroPedido := Fpedido.numero;
-      FitemPedido.codigoItem := StrToInt(Copy(cbbItem.Text, 1, 4));
+      FitemPedido.codigoItem := Integer(cbbItem.Items.Objects[cbbItem.ItemIndex]);
+
+      if ((novoItem) and (FitemPedido.ItemExistenteNoPedido)) then
+      begin
+        ShowMessage('Item já existe no pedido, não é possível adicionar itens duplicados!');
+        Exit;
+      end;
+
       FitemPedido.quantidade := StrToInt(edtQuantidade.Text);
-      FitemPedido.desconto := StrToFloat(edtValorDesconto.Text);
+      FitemPedido.desconto := StrToFloat(StringReplace(edtValorDesconto.Text, '.', '', [rfReplaceAll]));
 
       Fitem.codigo := FitemPedido.codigoItem;
       Fitem.BuscarInformacoesItem;
@@ -456,10 +541,12 @@ begin
 
       sbtCancelarEdicaoItemClick(Self);
 
-      Fpedido.valorTotal := FitemPedido.RetornaValorTotalSomado;
+      Fpedido.valorTotal := FitemPedido.RetornaValorBruto;
       Fpedido.AtualizarValorTotal;
 
       dbgPedidosCellClick(nil);
+
+      CarregarTotalizadores;
     except
       on e:Exception do
       begin
@@ -524,6 +611,15 @@ end;
 procedure TfPedidos.sbtEditarItemClick(Sender: TObject);
 begin
   try
+    if quItensPedido.Eof then
+      Exit;
+
+    if quItensPedido.FieldByName('NUMEROPEDIDO').AsInteger <= 0 then
+    begin
+      ShowMessage('Um item deve ser selecionado para exclusão.');
+      Exit;
+    end;
+
     pnlPedidos.Enabled := False;
     dbgItensPedido.Enabled := False;
     sbtNovoItem.Enabled := False;
@@ -543,6 +639,15 @@ end;
 procedure TfPedidos.sbtEditarPedidoClick(Sender: TObject);
 begin
   try
+    if quPedidos.Eof then
+      Exit;
+
+    if quPedidos.FieldByName('NUMERO').AsInteger <= 0 then
+    begin
+      ShowMessage('Um pedido deve ser selecionado para exclusão.');
+      Exit;
+    end;
+
     pnlCamposPedidos.Enabled := True;
     grpFiltro.Enabled := False;
     sbtConfirmarPedido.Enabled := True;
@@ -562,6 +667,9 @@ end;
 
 procedure TfPedidos.sbtExcluirItemClick(Sender: TObject);
 begin
+  if quItensPedido.Eof then
+    Exit;
+
   if quItensPedido.FieldByName('NUMEROPEDIDO').AsInteger <= 0 then
   begin
     ShowMessage('Um item deve ser selecionado para exclusão.');
@@ -590,6 +698,8 @@ begin
         ShowMessage('Erro ao excluir item.' + #13 + 'Erro: ' + e.Message);
       end;
     end;
+
+    LimpaCamposItensPedido;
   finally
     if Fconexao.InTransaction then
       Fconexao.Rollback;
@@ -598,6 +708,9 @@ end;
 
 procedure TfPedidos.sbtExcluirPedidoClick(Sender: TObject);
 begin
+  if quPedidos.Eof then
+    Exit;
+
   if quPedidos.FieldByName('NUMERO').AsInteger <= 0 then
   begin
     ShowMessage('Um pedido deve ser selecionado para exclusão.');
@@ -635,6 +748,8 @@ begin
         ShowMessage('Erro ao excluir pedido.' + #13 + 'Erro: ' + e.Message);
       end;
     end;
+
+    LimpaCamposPedido;
   finally
     if Fconexao.InTransaction then
       Fconexao.Rollback;
@@ -644,6 +759,8 @@ end;
 procedure TfPedidos.sbtNovoItemClick(Sender: TObject);
 begin
   try
+    LimpaCamposItensPedido;
+
     pnlPedidos.Enabled := False;
     dbgItensPedido.Enabled := False;
     sbtNovoItem.Enabled := False;
@@ -653,6 +770,7 @@ begin
     pnlDadosItens.Enabled := True;
     sbtConfirmarItemPedido.Enabled := True;
     novoItem := True;
+
     cbbItem.SetFocus;
   except
     on e:Exception do
@@ -663,6 +781,8 @@ end;
 procedure TfPedidos.sbtNovoPedidoClick(Sender: TObject);
 begin
   try
+    LimpaCamposPedido;
+
     pnlCamposPedidos.Enabled := True;
     grpFiltro.Enabled := False;
     sbtConfirmarPedido.Enabled := True;

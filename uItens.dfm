@@ -25,12 +25,7 @@ object fItens: TfItens
     Height = 412
     Align = alClient
     BevelOuter = bvNone
-    Enabled = False
     TabOrder = 0
-    ExplicitLeft = -256
-    ExplicitTop = 163
-    ExplicitWidth = 932
-    ExplicitHeight = 249
     object pnlItens: TPanel
       Left = 0
       Top = 0
@@ -48,7 +43,6 @@ object fItens: TfItens
       ParentBackground = False
       ParentFont = False
       TabOrder = 0
-      ExplicitWidth = 932
       object pnl6: TPanel
         Left = 548
         Top = 0
@@ -63,13 +57,13 @@ object fItens: TfItens
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitLeft = 762
         object sbtNovoItem: TPngSpeedButton
           Left = 8
           Top = 2
           Width = 23
           Height = 22
           Flat = True
+          OnClick = sbtNovoItemClick
           PngImage.Data = {
             89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
             610000000473424954080808087C086488000000097048597300000B1300000B
@@ -141,6 +135,7 @@ object fItens: TfItens
           Height = 22
           Enabled = False
           Flat = True
+          OnClick = sbtConfirmarItemClick
           PngImage.Data = {
             89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
             610000000473424954080808087C086488000000097048597300000B1300000B
@@ -164,7 +159,6 @@ object fItens: TfItens
       Enabled = False
       ParentBackground = False
       TabOrder = 1
-      ExplicitWidth = 676
       object lblValor: TLabel
         Left = 51
         Top = 19
@@ -185,9 +179,12 @@ object fItens: TfItens
         Width = 100
         Height = 21
         Alignment = taRightJustify
-        MaxLength = 10
+        MaxLength = 11
         TabOrder = 0
         Text = '0,00'
+        OnEnter = edtValorEnter
+        OnExit = edtValorExit
+        OnKeyPress = edtValorKeyPress
       end
       object chkAtivo: TCheckBox
         Left = 198
@@ -197,7 +194,7 @@ object fItens: TfItens
         Caption = 'Ativo'
         TabOrder = 1
       end
-      object mmoDescricaoPedido: TMemo
+      object mmoDescricao: TMemo
         Left = 78
         Top = 40
         Width = 570
@@ -222,6 +219,7 @@ object fItens: TfItens
       TitleFont.Height = -11
       TitleFont.Name = 'Tahoma'
       TitleFont.Style = []
+      OnCellClick = dbgItensCellClick
       Columns = <
         item
           Expanded = False
@@ -268,6 +266,7 @@ object fItens: TfItens
       FieldName = 'codigo'
       Origin = 'codigo'
       ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
     end
     object quItensdescricao: TStringField
       FieldName = 'descricao'

@@ -200,7 +200,6 @@
         Ctl3D = False
         ParentCtl3D = False
         TabOrder = 0
-        OnDropDown = cbbItemDropDown
       end
       object edtQuantidade: TEdit
         Left = 72
@@ -212,6 +211,7 @@
         MaxLength = 4
         ParentCtl3D = False
         TabOrder = 1
+        Text = '0'
       end
       object edtValorDesconto: TEdit
         Left = 199
@@ -219,9 +219,10 @@
         Width = 100
         Height = 21
         Alignment = taRightJustify
-        MaxLength = 10
+        MaxLength = 11
         TabOrder = 2
         Text = '0,00'
+        OnEnter = edtValorDescontoEnter
         OnExit = edtValorDescontoExit
         OnKeyPress = edtValorDescontoKeyPress
       end
@@ -242,6 +243,7 @@
       TitleFont.Height = -11
       TitleFont.Name = 'Tahoma'
       TitleFont.Style = []
+      OnCellClick = dbgItensPedidoCellClick
       Columns = <
         item
           Expanded = False
@@ -912,10 +914,12 @@
     object quItensPedidodesconto: TFloatField
       FieldName = 'desconto'
       Origin = 'desconto'
+      DisplayFormat = '##,###,##0.00'
     end
     object quItensPedidovalorTotal: TFloatField
       FieldName = 'valorTotal'
       Origin = 'valorTotal'
+      DisplayFormat = '##,###,##0.00'
     end
     object quItensPedidonumeroPedido: TIntegerField
       FieldName = 'numeroPedido'
@@ -940,6 +944,7 @@
       Origin = 'valor'
       ProviderFlags = []
       ReadOnly = True
+      DisplayFormat = '##,###,##0.00'
     end
   end
   object dsItensPedido: TDataSource

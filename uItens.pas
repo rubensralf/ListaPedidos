@@ -28,7 +28,7 @@ type
     edtValor: TEdit;
     chkAtivo: TCheckBox;
     lblDescricao: TLabel;
-    mmoDescricaoPedido: TMemo;
+    mmoDescricao: TMemo;
     quItens: TFDQuery;
     dsItens: TDataSource;
     quItenscodigo: TFDAutoIncField;
@@ -40,6 +40,12 @@ type
     procedure sbtCancelarEdicaoItemClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure sbtEditarItemClick(Sender: TObject);
+    procedure sbtNovoItemClick(Sender: TObject);
+    procedure sbtConfirmarItemClick(Sender: TObject);
+    procedure edtValorKeyPress(Sender: TObject; var Key: Char);
+    procedure edtValorExit(Sender: TObject);
+    procedure dbgItensCellClick(Column: TColumn);
+    procedure edtValorEnter(Sender: TObject);
 
   private
     { Private declarations }
@@ -47,6 +53,8 @@ type
     Fitem : TItem;
     novoItem : Boolean;
     alterarItem : Boolean;
+
+    procedure LimpaCampos;
 
   public
     { Public declarations }
@@ -96,6 +104,59 @@ begin
   end;
 end;
 
+procedure TfItens.dbgItensCellClick(Column: TColumn);
+begin
+  try
+    if not quItens.Eof then
+    begin
+      Fitem.codigo := quItens.FieldByName('CODIGO').AsInteger;
+      Fitem.descricao := quItens.FieldByName('DESCRICAO').AsString;
+      Fitem.valor := quItens.FieldByName('VALOR').AsFloat;
+      Fitem.ativo := quItens.FieldByName('ATIVO').AsString = 'Sim';
+
+      edtValor.Text := FloatToStr(Fitem.valor);
+      edtValorExit(Self);
+      chkAtivo.Checked := Fitem.ativo;
+      mmoDescricao.Lines.Text := Fitem.descricao;
+    end;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao carregar informações do item!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
+procedure TfItens.edtValorEnter(Sender: TObject);
+begin
+  edtValor.Text := StringReplace(edtValor.Text, '.', '', [rfReplaceAll]);
+end;
+
+procedure TfItens.edtValorExit(Sender: TObject);
+begin
+  try
+    if Trim(edtValor.Text) <> '' then
+    begin
+      if StrToFloat(StringReplace(edtValor.Text, '.', '', [rfReplaceAll])) > 0 then
+      begin
+        edtValor.Text := FormatFloat('##,###,###.##', StrToFloat(edtValor.Text));
+      end;
+    end;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao formatar valor!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
+procedure TfItens.edtValorKeyPress(Sender: TObject; var Key: Char);
+begin
+  try
+    if not (Key in ['0'..'9', Chr(44), Chr(127), Chr(8)]) then
+      Key := #0;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao aplicar regra!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
 procedure TfItens.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Fconexao.Connected := False;
@@ -110,11 +171,24 @@ begin
   alterarItem := False;
 end;
 
+procedure TfItens.LimpaCampos;
+begin
+  try
+    edtValor.Text := '0,00';
+    chkAtivo.Checked := False;
+    mmoDescricao.Lines.Clear;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao limpar campos!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
 procedure TfItens.sbtCancelarEdicaoItemClick(Sender: TObject);
 begin
   try
     pnlDadosItens.Enabled := False;
     sbtCancelarEdicaoItem.Enabled := False;
+    sbtConfirmarItem.Enabled := False;
     dbgItens.Enabled := True;
     sbtNovoItem.Enabled := True;
     sbtExcluirItem.Enabled := True;
@@ -127,9 +201,85 @@ begin
   end;
 end;
 
+procedure TfItens.sbtConfirmarItemClick(Sender: TObject);
+begin
+  try
+    Fconexao.StartTransaction;
+
+    try
+      if Trim(mmoDescricao.Lines.Text) = '' then
+      begin
+        ShowMessage('Uma descrição deve ser informada!');
+        mmoDescricao.SetFocus;
+        Exit;
+      end;
+
+      if Trim(edtValor.Text) = '' then
+      begin
+        ShowMessage('Um valor deve ser informado!');
+        edtValor.SetFocus;
+        Exit;
+      end;
+
+      if StrToFloat(StringReplace(edtValor.Text, '.', '', [rfReplaceAll])) <= 0 then
+      begin
+        ShowMessage('O valor deve ser maior que zero!');
+        edtValor.SetFocus;
+        Exit;
+      end;
+
+      if StrToFloat(StringReplace(edtValor.Text, '.', '', [rfReplaceAll])) > 99999999.99  then
+      begin
+        ShowMessage('O valor deve ser menor que R$99.999.999,99!');
+        edtValor.SetFocus;
+        Exit;
+      end;
+
+      Fitem.valor := StrToFloat(StringReplace(edtValor.Text, '.', '', [rfReplaceAll]));
+      Fitem.descricao := mmoDescricao.Lines.Text;
+      Fitem.ativo := chkAtivo.Checked;
+
+      if novoItem then
+        Fitem.Salvar
+      else
+        if alterarItem then
+        begin
+          Fitem.codigo := quItens.FieldByName('CODIGO').AsInteger;
+          Fitem.Editar;
+        end
+        else
+          raise Exception.Create('Nenhuma operação de item selecionada!');
+
+      quItens.Refresh;
+
+      sbtCancelarEdicaoItemClick(Self);
+
+      Fconexao.Commit;
+    except
+      on e:Exception do
+      begin
+        Fconexao.Rollback;
+        ShowMessage('Erro ao salvar pedido.' + #13 + 'Erro: ' + e.Message);
+      end;
+    end;
+  finally
+    if Fconexao.InTransaction then
+      Fconexao.Rollback;
+  end;
+end;
+
 procedure TfItens.sbtEditarItemClick(Sender: TObject);
 begin
   try
+    if quItens.Eof then
+      Exit;
+
+    if quItens.FieldByName('CODIGO').AsInteger <= 0 then
+    begin
+      ShowMessage('Um item deve ser selecionado para exclusão.');
+      Exit;
+    end;
+
     dbgItens.Enabled := False;
     sbtNovoItem.Enabled := False;
     sbtExcluirItem.Enabled := False;
@@ -167,6 +317,10 @@ begin
       Fitem.Excluir;
 
       Fconexao.Commit;
+
+      LimpaCampos;
+
+      quItens.Refresh;
     except
       on e:Exception do
       begin
@@ -177,6 +331,27 @@ begin
   finally
     if Fconexao.InTransaction then
       Fconexao.Rollback;
+  end;
+end;
+
+procedure TfItens.sbtNovoItemClick(Sender: TObject);
+begin
+  try
+    LimpaCampos;
+
+    dbgItens.Enabled := False;
+    sbtNovoItem.Enabled := False;
+    sbtExcluirItem.Enabled := False;
+    sbtEditarItem.Enabled := False;
+    sbtCancelarEdicaoItem.Enabled := True;
+    pnlDadosItens.Enabled := True;
+    sbtConfirmarItem.Enabled := True;
+    novoItem := True;
+    chkAtivo.Checked := True;
+    edtValor.SetFocus;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao habilitar inserção de item!' + #13 + 'Erro: ' + e.Message);
   end;
 end;
 

@@ -15,8 +15,6 @@ type
       Fconexao : TFDConnection;
       FvalorTotal : Double;
 
-      const tabelaItensPedido : String = 'ITENSPEDIDO';
-
     protected
       function getNumeroPedido: Integer;
       function getCodigoItem: Integer;
@@ -41,7 +39,10 @@ type
       function Excluir : Boolean;
       function ExcluirItensPorPedido : Boolean;
       function PossuiItens : Boolean;
-      function RetornaValorTotalSomado : Double;
+      function RetornaValorBruto : Double;
+      function RetornaValorDesconto : Double;
+      function RetornaValorLiquido : Double;
+      function ItemExistenteNoPedido : Boolean;
 
       procedure CarregarItensPedido(var quItensPedido : TFDQuery);
 
@@ -147,8 +148,8 @@ begin
     try
       quInserir.Close;
       quInserir.SQL.Clear;
-      quInserir.SQL.Add('INSERT INTO ' + tabelaItensPedido + '( NUMEROPEDIDO,  CODIGOITEM,  QUANTIDADE,  DESCONTO,  VALORTOTAL)');
-      quInserir.SQL.Add('VALUES                               (:NUMEROPEDIDO, :CODIGOITEM, :QUANTIDADE, :DESCONTO, :VALORTOTAL)');
+      quInserir.SQL.Add('INSERT INTO ITENSPEDIDO ( NUMEROPEDIDO,  CODIGOITEM,  QUANTIDADE,  DESCONTO,  VALORTOTAL)');
+      quInserir.SQL.Add('VALUES                  (:NUMEROPEDIDO, :CODIGOITEM, :QUANTIDADE, :DESCONTO, :VALORTOTAL)');
       quInserir.Params.ParamByName('NUMEROPEDIDO').AsInteger := numeroPedido;
       quInserir.Params.ParamByName('CODIGOITEM').AsInteger := codigoItem;
       quInserir.Params.ParamByName('QUANTIDADE').AsInteger := quantidade;
@@ -183,7 +184,7 @@ begin
     try
       quEditar.Close;
       quEditar.SQL.Clear;
-      quEditar.SQL.Add('UPDATE ' + tabelaItensPedido);
+      quEditar.SQL.Add('UPDATE ITENSPEDIDO');
       quEditar.SQL.Add('SET    QUANTIDADE = :QUANTIDADE,');
       quEditar.SQL.Add('       DESCONTO = :DESCONTO,');
       quEditar.SQL.Add('       VALORTOTAL =  :VALORTOTAL');
@@ -192,7 +193,7 @@ begin
       quEditar.Params.ParamByName('QUANTIDADE').AsInteger := quantidade;
       quEditar.Params.ParamByName('DESCONTO').AsFloat := desconto;
       quEditar.Params.ParamByName('VALORTOTAL').AsFloat := valorTotal;
-      quEditar.Params.ParamByName('NUMEROPEDIDO').AsDate := numeroPedido;
+      quEditar.Params.ParamByName('NUMEROPEDIDO').AsInteger := numeroPedido;
       quEditar.Params.ParamByName('CODIGOITEM').AsInteger := codigoItem;
       quEditar.ExecSQL;
 
@@ -223,10 +224,10 @@ begin
     try
       quExcluir.Close;
       quExcluir.SQL.Clear;
-      quExcluir.SQL.Add('DELETE FROM ' + tabelaItensPedido);
+      quExcluir.SQL.Add('DELETE FROM ITENSPEDIDO');
       quExcluir.SQL.Add('WHERE  NUMEROPEDIDO = :NUMEROPEDIDO');
       quExcluir.SQL.Add('AND    CODIGOITEM = :CODIGOITEM');
-      quExcluir.Params.ParamByName('NUMEROPEDIDO').AsDate := numeroPedido;
+      quExcluir.Params.ParamByName('NUMEROPEDIDO').AsInteger := numeroPedido;
       quExcluir.Params.ParamByName('CODIGOITEM').AsInteger := codigoItem;
       quExcluir.ExecSQL;
 
@@ -257,9 +258,9 @@ begin
     try
       quExcluir.Close;
       quExcluir.SQL.Clear;
-      quExcluir.SQL.Add('DELETE FROM ' + tabelaItensPedido);
+      quExcluir.SQL.Add('DELETE FROM ITENSPEDIDO');
       quExcluir.SQL.Add('WHERE  NUMEROPEDIDO = :NUMEROPEDIDO');
-      quExcluir.Params.ParamByName('NUMEROPEDIDO').AsDate := numeroPedido;
+      quExcluir.Params.ParamByName('NUMEROPEDIDO').AsInteger := numeroPedido;
       quExcluir.ExecSQL;
 
       if quExcluir.RowsAffected < 1 then
@@ -307,34 +308,128 @@ begin
   end;
 end;
 
-function TItemPedido.RetornaValorTotalSomado: Double;
+function TItemPedido.RetornaValorBruto: Double;
 var
-  quSomarValorTotal : TFDQuery;
+  quValorBruto : TFDQuery;
 begin
   try
     result := 0;
 
-    quSomarValorTotal := TFDQuery.Create(nil);
-    quSomarValorTotal.Connection := Fconexao;
+    quValorBruto := TFDQuery.Create(nil);
+    quValorBruto.Connection := Fconexao;
 
     try
-      quSomarValorTotal.Close;
-      quSomarValorTotal.SQL.Clear;
-      quSomarValorTotal.SQL.Add('SELECT SUM(VALORTOTAL) VALORTOTAL');
-      quSomarValorTotal.SQL.Add('FROM   ITENSPEDIDO');
-      quSomarValorTotal.SQL.Add('WHERE  NUMEROPEDIDO = :NUMEROPEDIDO');
-      quSomarValorTotal.Params.ParamByName('NUMEROPEDIDO').AsInteger := numeroPedido;
-      quSomarValorTotal.Open;
+      quValorBruto.Close;
+      quValorBruto.SQL.Clear;
+      quValorBruto.SQL.Add('SELECT IFNULL(SUM(ITEM.VALOR * ITPED.QUANTIDADE), 0) AS VALORBRUTO');
+      quValorBruto.SQL.Add('FROM   ITENSPEDIDO ITPED');
+      quValorBruto.SQL.Add('       INNER JOIN ITENS ITEM ON ITEM.CODIGO = ITPED.CODIGOITEM');
+      quValorBruto.SQL.Add('WHERE  ITPED.NUMEROPEDIDO = :NUMEROPEDIDO');
+      quValorBruto.Params.ParamByName('NUMEROPEDIDO').AsInteger := numeroPedido;
+      quValorBruto.Open;
 
-      if not quSomarValorTotal.Eof then
-        result := quSomarValorTotal.FieldByName('VALORTOTAL').AsFloat;
+      if not quValorBruto.Eof then
+        result := quValorBruto.FieldByName('VALORBRUTO').AsFloat;
     except
       on e:Exception do
         raise Exception.Create(e.Message);
     end;
   finally
-    quSomarValorTotal.Close;
-    FreeAndNil(quSomarValorTotal);
+    quValorBruto.Close;
+    FreeAndNil(quValorBruto);
+  end;
+end;
+
+function TItemPedido.RetornaValorDesconto: Double;
+var
+  quValorDesconto : TFDQuery;
+begin
+  try
+    result := 0;
+
+    quValorDesconto := TFDQuery.Create(nil);
+    quValorDesconto.Connection := Fconexao;
+
+    try
+      quValorDesconto.Close;
+      quValorDesconto.SQL.Clear;
+      quValorDesconto.SQL.Add('SELECT IFNULL(SUM(DESCONTO), 0) DESCONTO');
+      quValorDesconto.SQL.Add('FROM   ITENSPEDIDO');
+      quValorDesconto.SQL.Add('WHERE  NUMEROPEDIDO = :NUMEROPEDIDO');
+      quValorDesconto.Params.ParamByName('NUMEROPEDIDO').AsInteger := numeroPedido;
+      quValorDesconto.Open;
+
+      if not quValorDesconto.Eof then
+        result := quValorDesconto.FieldByName('DESCONTO').AsFloat;
+    except
+      on e:Exception do
+        raise Exception.Create(e.Message);
+    end;
+  finally
+    quValorDesconto.Close;
+    FreeAndNil(quValorDesconto);
+  end;
+end;
+
+function TItemPedido.RetornaValorLiquido: Double;
+var
+  quValorLiquido : TFDQuery;
+begin
+  try
+    result := 0;
+
+    quValorLiquido := TFDQuery.Create(nil);
+    quValorLiquido.Connection := Fconexao;
+
+    try
+      quValorLiquido.Close;
+      quValorLiquido.SQL.Clear;
+      quValorLiquido.SQL.Add('SELECT IFNULL(SUM(VALORTOTAL), 0) AS VALORTOTAL');
+      quValorLiquido.SQL.Add('FROM   ITENSPEDIDO');
+      quValorLiquido.SQL.Add('WHERE  NUMEROPEDIDO = :NUMEROPEDIDO');
+      quValorLiquido.Params.ParamByName('NUMEROPEDIDO').AsInteger := numeroPedido;
+      quValorLiquido.Open;
+
+      if not quValorLiquido.Eof then
+        result := quValorLiquido.FieldByName('VALORTOTAL').AsFloat;
+    except
+      on e:Exception do
+        raise Exception.Create(e.Message);
+    end;
+  finally
+    quValorLiquido.Close;
+    FreeAndNil(quValorLiquido);
+  end;
+end;
+
+function TItemPedido.ItemExistenteNoPedido: Boolean;
+var
+  quItemExistente : TFDQuery;
+begin
+  try
+    result := False;
+
+    quItemExistente := TFDQuery.Create(nil);
+    quItemExistente.Connection := Fconexao;
+
+    try
+      quItemExistente.Close;
+      quItemExistente.SQL.Clear;
+      quItemExistente.SQL.Add('SELECT CODIGOITEM');
+      quItemExistente.SQL.Add('FROM   ITENSPEDIDO');
+      quItemExistente.SQL.Add('WHERE  CODIGOITEM = :CODIGOITEM');
+      quItemExistente.Params.ParamByName('CODIGOITEM').AsInteger := codigoItem;
+      quItemExistente.Open;
+
+      if not quItemExistente.Eof then
+        result := True;
+    except
+      on e:Exception do
+        raise Exception.Create(e.Message);
+    end;
+  finally
+    quItemExistente.Close;
+    FreeAndNil(quItemExistente);
   end;
 end;
 

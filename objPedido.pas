@@ -16,8 +16,6 @@ type
       FvalorTotal : Double;
       Fconexao : TFDConnection;
 
-      const tabelaPedidos : String = 'PEDIDOS';
-
     protected
       function getNumero : Integer;
       function getData : TDate;
@@ -162,8 +160,8 @@ begin
     try
       quInserir.Close;
       quInserir.SQL.Clear;
-      quInserir.SQL.Add('INSERT INTO ' + tabelaPedidos + '(DATA,  DESCRICAO,  SITUACAO,  VALORTOTAL)');
-      quInserir.SQL.Add('VALUES                          (:DATA, :DESCRICAO, :SITUACAO, :VALORTOTAL)');
+      quInserir.SQL.Add('INSERT INTO PEDIDOS (DATA,  DESCRICAO,  SITUACAO,  VALORTOTAL)');
+      quInserir.SQL.Add('VALUES              (:DATA, :DESCRICAO, :SITUACAO, :VALORTOTAL)');
       quInserir.Params.ParamByName('DATA').AsDate := data;
       quInserir.Params.ParamByName('DESCRICAO').AsString := descricao;
       quInserir.Params.ParamByName('SITUACAO').AsInteger := situacao;
@@ -197,7 +195,7 @@ begin
     try
       quEditar.Close;
       quEditar.SQL.Clear;
-      quEditar.SQL.Add('UPDATE ' + tabelaPedidos);
+      quEditar.SQL.Add('UPDATE PEDIDOS');
       quEditar.SQL.Add('SET    DATA = :DATA,');
       quEditar.SQL.Add('       DESCRICAO = :DESCRICAO');
       quEditar.SQL.Add('WHERE  NUMERO = :NUMERO');
@@ -233,7 +231,7 @@ begin
     try
       quExcluir.Close;
       quExcluir.SQL.Clear;
-      quExcluir.SQL.Add('DELETE FROM ' + tabelaPedidos);
+      quExcluir.SQL.Add('DELETE FROM PEDIDOS');
       quExcluir.SQL.Add('WHERE  NUMERO = :NUMERO');
       quExcluir.Params.ParamByName('NUMERO').AsInteger := numero;
       quExcluir.ExecSQL;
@@ -265,7 +263,7 @@ begin
     try
       quAlterarSituacao.Close;
       quAlterarSituacao.SQL.Clear;
-      quAlterarSituacao.SQL.Add('UPDATE ' + tabelaPedidos);
+      quAlterarSituacao.SQL.Add('UPDATE PEDIDOS');
       quAlterarSituacao.SQL.Add('SET    SITUACAO = :SITUACAO');
       quAlterarSituacao.SQL.Add('WHERE  NUMERO = :NUMERO');
       quAlterarSituacao.Params.ParamByName('SITUACAO').AsInteger := situacao;
@@ -299,7 +297,7 @@ begin
     try
       quAtualizarValor.Close;
       quAtualizarValor.SQL.Clear;
-      quAtualizarValor.SQL.Add('UPDATE ' + tabelaPedidos);
+      quAtualizarValor.SQL.Add('UPDATE PEDIDOS');
       quAtualizarValor.SQL.Add('SET    VALORTOTAL = :VALORTOTAL');
       quAtualizarValor.SQL.Add('WHERE  NUMERO = :NUMERO');
       quAtualizarValor.Params.ParamByName('VALORTOTAL').AsFloat := valorTotal;
