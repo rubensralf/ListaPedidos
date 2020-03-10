@@ -417,7 +417,9 @@ begin
       quItemExistente.SQL.Clear;
       quItemExistente.SQL.Add('SELECT CODIGOITEM');
       quItemExistente.SQL.Add('FROM   ITENSPEDIDO');
-      quItemExistente.SQL.Add('WHERE  CODIGOITEM = :CODIGOITEM');
+      quItemExistente.SQL.Add('WHERE  NUMEROPEDIDO = :NUMEROPEDIDO');
+      quItemExistente.SQL.Add('AND    CODIGOITEM = :CODIGOITEM');
+      quItemExistente.Params.ParamByName('NUMEROPEDIDO').AsInteger := numeroPedido;
       quItemExistente.Params.ParamByName('CODIGOITEM').AsInteger := codigoItem;
       quItemExistente.Open;
 

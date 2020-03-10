@@ -14,6 +14,7 @@
   OldCreateOrder = False
   Visible = True
   WindowState = wsMaximized
+  OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
@@ -317,6 +318,7 @@
       DataSource = dsPedidos
       GradientEndColor = 14084566
       Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+      PopupMenu = pmOpcoes
       TabOrder = 0
       TitleFont.Charset = DEFAULT_CHARSET
       TitleFont.Color = clWindowText
@@ -951,5 +953,20 @@
     DataSet = quItensPedido
     Left = 232
     Top = 672
+  end
+  object pmOpcoes: TPopupMenu
+    OnPopup = pmOpcoesPopup
+    Left = 520
+    Top = 271
+    object mniAprovarPedido: TMenuItem
+      Tag = 2
+      Caption = 'Aprovar pedido'
+      OnClick = mniAprovarPedidoClick
+    end
+    object mniCancelarPedido: TMenuItem
+      Tag = 3
+      Caption = 'Cancelar Pedido'
+      OnClick = mniAprovarPedidoClick
+    end
   end
 end

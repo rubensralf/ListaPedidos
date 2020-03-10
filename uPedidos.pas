@@ -11,7 +11,7 @@ uses
   Vcl.StdCtrls, Vcl.Buttons, PngSpeedButton, Vcl.ComCtrls, Vcl.Mask,
   FireDAC.UI.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Phys,
   FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef, FireDAC.Stan.ExprFuncs,
-  FireDAC.VCLUI.Wait, objPedido, objItemPedido, objItem, objSituacao;
+  FireDAC.VCLUI.Wait, objPedido, objItemPedido, objItem, objSituacao, Vcl.Menus;
 
 type
   TfPedidos = class(TForm)
@@ -85,6 +85,9 @@ type
     quItensPedidodescricao: TStringField;
     quItensPedidovaloritem: TFloatField;
     edtValorDesconto: TEdit;
+    pmOpcoes: TPopupMenu;
+    mniAprovarPedido: TMenuItem;
+    mniCancelarPedido: TMenuItem;
     procedure sbtExcluirPedidoClick(Sender: TObject);
     procedure sbtSairClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -104,6 +107,9 @@ type
     procedure edtValorDescontoExit(Sender: TObject);
     procedure dbgItensPedidoCellClick(Column: TColumn);
     procedure edtValorDescontoEnter(Sender: TObject);
+    procedure mniAprovarPedidoClick(Sender: TObject);
+    procedure pmOpcoesPopup(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
 
   private
     { Private declarations }
@@ -390,6 +396,12 @@ begin
   end;
 end;
 
+procedure TfPedidos.FormActivate(Sender: TObject);
+begin
+  if Fconexao <> nil then
+    CarregarItensComboBox;
+end;
+
 procedure TfPedidos.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Fconexao.Connected := False;
@@ -440,6 +452,29 @@ begin
   except
     on e:Exception do
       ShowMessage('Erro ao limpar campos do pedido!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
+procedure TfPedidos.mniAprovarPedidoClick(Sender: TObject);
+begin
+  try
+    Fpedido.situacao := TMenuItem(Sender).Tag;
+    Fpedido.AlterarSituacao;
+    quPedidos.Refresh;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao alterar situação do pedido para ' + TMenuItem(Sender).Caption + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
+procedure TfPedidos.pmOpcoesPopup(Sender: TObject);
+begin
+  try
+    mniAprovarPedido.Enabled := Fpedido.situacao = 1;
+    mniCancelarPedido.Enabled := Fpedido.situacao = 1;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao validar situação!' + #13 + 'Erro: ' + e.Message);
   end;
 end;
 
@@ -770,7 +805,6 @@ begin
     pnlDadosItens.Enabled := True;
     sbtConfirmarItemPedido.Enabled := True;
     novoItem := True;
-
     cbbItem.SetFocus;
   except
     on e:Exception do

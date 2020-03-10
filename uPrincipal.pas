@@ -61,6 +61,12 @@ end;
 procedure TfPrincipal.mniItensClick(Sender: TObject);
 begin
   try
+    if fItens <> nil then
+    begin
+      ShowMessage('Já existe uma tela de itens aberta!');
+      Exit;
+    end;
+
     fItens := TfItens.Create(Self);
     fItens.AtribuiConexao(Fconexao);
     fItens.Show;
@@ -73,6 +79,12 @@ end;
 procedure TfPrincipal.mniPedidosClick(Sender: TObject);
 begin
   try
+    if fPedidos <> nil then
+    begin
+      ShowMessage('Já existe uma tela de pedidos aberta!');
+      Exit;
+    end;
+
     fPedidos := TfPedidos.Create(Self);
     fPedidos.AtribuiConexao(Fconexao);
     fPedidos.CarregarPedidos;

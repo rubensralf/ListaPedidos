@@ -259,7 +259,7 @@ begin
       on e:Exception do
       begin
         Fconexao.Rollback;
-        ShowMessage('Erro ao salvar pedido.' + #13 + 'Erro: ' + e.Message);
+        ShowMessage('Erro ao salvar/alterar item.' + #13 + 'Erro: ' + e.Message);
       end;
     end;
   finally

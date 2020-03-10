@@ -38,8 +38,8 @@ type
       function Salvar : Boolean;
       function Editar : Boolean;
       function Excluir : Boolean;
-      function AlterarSituacao(novaSituacao : Integer) : Boolean;
-      function AtualizarValorTotal : Boolean;
+      procedure AlterarSituacao;
+      procedure AtualizarValorTotal;
       procedure CarregarPedidos(var quPedidos : TFDQuery; dataInicial, dataFinal : TDate);
 
       constructor Create(objConexao : TFDConnection);
@@ -250,13 +250,11 @@ begin
   end;
 end;
 
-function TPedido.AlterarSituacao(novaSituacao: Integer) : Boolean;
+procedure TPedido.AlterarSituacao;
 var
   quAlterarSituacao : TFDQuery;
 begin
   try
-    result := False;
-
     quAlterarSituacao := TFDQuery.Create(nil);
     quAlterarSituacao.Connection := Fconexao;
 
@@ -273,7 +271,6 @@ begin
       if quAlterarSituacao.RowsAffected <> 1 then
         raise Exception.Create('Situação não alterada.');
 
-      result := True;
     except
       on e:Exception do
         raise Exception.Create(e.Message);
@@ -284,13 +281,11 @@ begin
   end;
 end;
 
-function TPedido.AtualizarValorTotal : Boolean;
+procedure TPedido.AtualizarValorTotal;
 var
   quAtualizarValor : TFDQuery;
 begin
   try
-    result := False;
-
     quAtualizarValor := TFDQuery.Create(nil);
     quAtualizarValor.Connection := Fconexao;
 
@@ -306,8 +301,6 @@ begin
 
       if quAtualizarValor.RowsAffected <> 1 then
         raise Exception.Create('Valor total não atualizado.');
-
-      result := True;
     except
       on e:Exception do
         raise Exception.Create(e.Message);
