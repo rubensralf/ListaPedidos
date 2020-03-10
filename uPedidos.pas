@@ -399,7 +399,10 @@ end;
 procedure TfPedidos.FormActivate(Sender: TObject);
 begin
   if Fconexao <> nil then
+  begin
+    CarregarPedidos;
     CarregarItensComboBox;
+  end;
 end;
 
 procedure TfPedidos.FormClose(Sender: TObject; var Action: TCloseAction);

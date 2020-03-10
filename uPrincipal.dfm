@@ -1,7 +1,7 @@
 object fPrincipal: TfPrincipal
   Left = 0
   Top = 0
-  Caption = 'Principal'
+  Caption = 'Pedidos'
   ClientHeight = 766
   ClientWidth = 1060
   Color = clBtnFace
