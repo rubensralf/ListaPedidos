@@ -18,11 +18,11 @@
 
 ##### Botões
 
-<img src="/ImagensDoc/Inserir.png"> - Habilita o modo de inserção de dados.
-<img src="/ImagensDoc/Editar.png"> - Habilita o modo de edição de dados.
-<img src="/ImagensDoc/Confirmar.png"> - Confirma a inserção/edição de dados.
-<img src="/ImagensDoc/Cancelar.png"> - Cancela a inserção/edição de dados.
-<img src="/ImagensDoc/Excluir.png"> - Exclui o item selecionado no grid.
+<img src="/ImagensDoc/Inserir.png"> - Habilita o modo de inserção de dados.  
+<img src="/ImagensDoc/Editar.png"> - Habilita o modo de edição de dados.  
+<img src="/ImagensDoc/Confirmar.png"> - Confirma a inserção/edição de dados.  
+<img src="/ImagensDoc/Cancelar.png"> - Cancela a inserção/edição de dados.  
+<img src="/ImagensDoc/Excluir.png"> - Exclui o item selecionado no grid.  
 
 ## Imagens
 
