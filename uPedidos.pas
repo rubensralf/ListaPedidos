@@ -564,6 +564,9 @@ begin
 
       FitemPedido.valorTotal := (Fitem.valor * FitemPedido.quantidade) - FitemPedido.desconto;
 
+      if FitemPedido.valorTotal <= 0 then
+        raise Exception.Create('O valor total do item deve ser maior que 0!');
+
       if novoItem then
         FitemPedido.Salvar
       else
@@ -579,7 +582,7 @@ begin
 
       sbtCancelarEdicaoItemClick(Self);
 
-      Fpedido.valorTotal := FitemPedido.RetornaValorBruto;
+      Fpedido.valorTotal := FitemPedido.RetornaValorLiquido;
       Fpedido.AtualizarValorTotal;
 
       dbgPedidosCellClick(nil);
@@ -618,17 +621,19 @@ begin
       begin
         Fpedido.situacao := 1; // 1 = Em análise
         Fpedido.Salvar;
+
+        CarregarPedidos;
+        dbgPedidosCellClick(nil);
       end
       else
         if alterarPedido then
         begin
           Fpedido.numero := quPedidos.FieldByName('NUMERO').AsInteger;
           Fpedido.Editar;
+          quPedidos.Refresh;
         end
         else
           raise Exception.Create('Nenhuma operação de pedido selecionada!');
-
-      quPedidos.Refresh;
 
       sbtCancelarEdicaoPedidoClick(Self);
 
@@ -677,6 +682,8 @@ end;
 procedure TfPedidos.sbtEditarPedidoClick(Sender: TObject);
 begin
   try
+    LimpaCamposItensPedido;
+
     if quPedidos.Eof then
       Exit;
 
@@ -819,6 +826,7 @@ procedure TfPedidos.sbtNovoPedidoClick(Sender: TObject);
 begin
   try
     LimpaCamposPedido;
+    LimpaCamposItensPedido;
 
     pnlCamposPedidos.Enabled := True;
     grpFiltro.Enabled := False;
