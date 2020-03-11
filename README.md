@@ -16,12 +16,22 @@
 * Alterar itens;
 * Excluir itens;
 
+##### Botões
+
+<img src="/ImagensDoc/Inserir.png"> - Habilita o modo de inserção de dados.
+<img src="/ImagensDoc/Editar.png"> - Habilita o modo de edição de dados.
+<img src="/ImagensDoc/Confirmar.png"> - Confirma a inserção/edição de dados.
+<img src="/ImagensDoc/Cancelar.png"> - Cancela a inserção/edição de dados.
+<img src="/ImagensDoc/Excluir.png"> - Exclui o item selecionado no grid.
+
 ## Imagens
 
 Abaixo é possível ver duas imagens, uma da tela de pedidos e outra da tela de itens, ambas com breves explicações do funcionamento.
 
+Tela pedidos:
 <img src="/ImagensDoc/Tela_Pedidos.png">
 
+Tela itens:
 <img src="/ImagensDoc/Tela_Itens.png">
 
 ## Configuração para utilização
