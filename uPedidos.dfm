@@ -203,8 +203,8 @@
         TabOrder = 0
       end
       object edtQuantidade: TEdit
-        Left = 72
-        Top = 37
+        Left = 75
+        Top = 38
         Width = 50
         Height = 19
         Alignment = taRightJustify
@@ -213,6 +213,7 @@
         ParentCtl3D = False
         TabOrder = 1
         Text = '0'
+        OnKeyPress = edtQuantidadeKeyPress
       end
       object edtValorDesconto: TEdit
         Left = 199

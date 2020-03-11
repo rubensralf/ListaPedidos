@@ -110,6 +110,7 @@ type
     procedure mniAprovarPedidoClick(Sender: TObject);
     procedure pmOpcoesPopup(Sender: TObject);
     procedure FormActivate(Sender: TObject);
+    procedure edtQuantidadeKeyPress(Sender: TObject; var Key: Char);
 
   private
     { Private declarations }
@@ -364,6 +365,17 @@ begin
   end;
 end;
 
+procedure TfPedidos.edtQuantidadeKeyPress(Sender: TObject; var Key: Char);
+begin
+  try
+    if not (Key in ['0'..'9', Chr(127), Chr(8)]) then
+      Key := #0;
+  except
+    on e:Exception do
+      ShowMessage('Erro ao aplicar regra!' + #13 + 'Erro: ' + e.Message);
+  end;
+end;
+
 procedure TfPedidos.edtValorDescontoEnter(Sender: TObject);
 begin
   edtValorDesconto.Text := StringReplace(edtValorDesconto.Text, '.', '', [rfReplaceAll]);
@@ -584,6 +596,8 @@ begin
 
       Fpedido.valorTotal := FitemPedido.RetornaValorLiquido;
       Fpedido.AtualizarValorTotal;
+
+      quPedidos.Refresh;
 
       dbgPedidosCellClick(nil);
 
