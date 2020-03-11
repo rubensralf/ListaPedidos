@@ -41,6 +41,7 @@ type
       procedure AlterarSituacao;
       procedure AtualizarValorTotal;
       procedure CarregarPedidos(var quPedidos : TFDQuery; dataInicial, dataFinal : TDate);
+      procedure LimparDados;
 
       constructor Create(objConexao : TFDConnection);
       destructor Destroy;
@@ -85,6 +86,20 @@ end;
 function TPedido.getValorTotal: Double;
 begin
   result := FvalorTotal;
+end;
+
+procedure TPedido.LimparDados;
+begin
+  try
+    numero := 0;
+    data := Now;
+    descricao := '';
+    situacao := 0;
+    valorTotal := 0;
+  except
+    on e:Exception do
+      raise Exception.Create('Erro ao limpar dados do pedido!' + #13 + 'Erro: ' + e.Message);
+  end;
 end;
 
 procedure TPedido.setData(const Value: TDate);

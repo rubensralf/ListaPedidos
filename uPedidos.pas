@@ -839,6 +839,8 @@ end;
 procedure TfPedidos.sbtNovoPedidoClick(Sender: TObject);
 begin
   try
+    Fpedido.LimparDados;
+
     LimpaCamposPedido;
     LimpaCamposItensPedido;
 
