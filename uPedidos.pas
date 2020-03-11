@@ -353,7 +353,7 @@ begin
       mmoDescricaoPedido.Lines.Text := Fpedido.descricao;
       pnlValorLiquido.Caption := 'R$' + FormatFloat('##,###,##0.00', Fpedido.valorTotal);
 
-      pnlFundoItens.Enabled := True;
+      pnlFundoItens.Enabled := Fpedido.situacao = 1;
       CarregarItensPedido;
 
       FitemPedido.numeroPedido := Fpedido.numero;
